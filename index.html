@@ -1,4 +1,965 @@
-   <p class="text-xs">Dicas e Reclamaçoes : Sandro21_cardeal@hotmail.COM</p
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efeito Matrix</title>
+    <!-- Incluindo Tailwind CSS para estilização rápida -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Importa a fonte Inter do Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            margin: 0;
+            overflow: hidden;
+        }
+        #app {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+            background-color: #000;
+        }
+        #main-content-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            width: 100%;
+        }
+        #menu-container {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #0f0;
+            border-radius: 1rem;
+            color: #0f0;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 0 20px #0f0, 0 0 30px #0f0 inset;
+            animation: pulse-green 2s infinite;
+            transition: all 0.5s ease-in-out;
+            display: block;
+        }
+        /* Animação de pulsação para o menu */
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 20px #0f0, 0 0 30px #0f0 inset; }
+            50% { box-shadow: 0 0 30px #0f0, 0 0 40px #0f0 inset; }
+            100% { box-shadow: 0 0 20px #0f0, 0 0 30px #0f0 inset; }
+        }
+        .matrix-title {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 5px #0f0;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .form-select, .form-input, .form-color, .form-range {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 0.75rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0f0;
+            border-radius: 0.5rem;
+            color: #0f0;
+            font-size: 0.875rem;
+        }
+        .form-color {
+            height: 40px;
+            padding: 0.25rem;
+        }
+        .form-range {
+            padding: 0;
+        }
+        .form-button {
+            width: 100%;
+            padding: 0.75rem;
+            background: #0f0;
+            color: #000;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px #0f0;
+        }
+        .form-button:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 20px #0f0;
+        }
+        #secret-message {
+            display: none;
+        }
+        #controls-container {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: none;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            flex-wrap: wrap;
+        }
+        #controls-container button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            background: rgba(15, 255, 0, 0.5);
+            color: #fff;
+            border: 2px solid #0f0;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            flex-grow: 1;
+            min-width: 0;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        #controls-container button:hover:not(:disabled) {
+            background: rgba(15, 255, 0, 0.8);
+            box-shadow: 0 0 10px #0f0;
+        }
+        #controls-container button:disabled {
+            background: rgba(15, 255, 0, 0.2);
+            border-color: #053b05;
+            cursor: not-allowed;
+        }
+        #controls-container button svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        .glitch-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            pointer-events: none;
+            color: red;
+            opacity: 0;
+        }
+        #controls-container button:hover .glitch-text {
+            animation: glitch 0.5s infinite;
+            opacity: 1;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-2px, 2px); }
+            50% { transform: translate(2px, -2px); }
+            75% { transform: translate(-2px, -2px); }
+            100% { transform: translate(2px, 2px); }
+        }
+        .ad-container {
+            display: none;
+            width: 250px;
+        }
+        .ad-link {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            min-height: 150px;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 2px solid #0f0;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+        .ad-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #0f0;
+        }
+        .ad-link img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            object-fit: cover;
+        }
+        #visitor-counter {
+            position: absolute;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #0f0;
+            color: #0f0;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1rem;
+        }
+        #horario {
+            position: absolute;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #0f0;
+            color: #0f0;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            top: 1rem;
+            left: 1rem;
+            font-size: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .message-box {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            display: none;
+            z-index: 20;
+            width: 300px;
+            border: 2px solid #0f0;
+        }
+        .message-box.active {
+            display: block;
+        }
+        .message-box.info { border-color: #3b82f6; color: #3b82f6; }
+        .message-box.error { border-color: #ef4444; color: #ef4444; }
+        .message-box.success { border-color: #22c55e; color: #22c55e; }
+        
+        /* Media queries para responsividade */
+        @media (min-width: 1024px) {
+            #main-content-container {
+                flex-direction: row;
+                gap: 2rem;
+                width: auto;
+            }
+            .ad-container {
+                display: flex;
+                flex-direction: column;
+                width: 250px;
+                gap: 1rem;
+            }
+            #controls-container button {
+                font-size: 1rem;
+            }
+            #ad-top-mobile, #ad-bottom-mobile {
+                display: none;
+            }
+        }
+        @media (max-width: 1023px) {
+            #main-content-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            #menu-container {
+                padding: 1rem;
+                width: 300px;
+            }
+            .matrix-title {
+                font-size: 1rem;
+            }
+            .form-label, .form-select, .form-input, .form-color, .form-range {
+                font-size: 0.75rem;
+            }
+            #ad-left-desktop, #ad-right-desktop {
+                display: none;
+            }
+            #ad-top-mobile, #ad-bottom-mobile {
+                display: block;
+            }
+            #controls-container {
+                flex-wrap: wrap;
+            }
+            #controls-container button {
+                flex-basis: calc(50% - 0.5rem);
+                font-size: 0.75rem;
+            }
+            #horario, #visitor-counter {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.6rem;
+            }
+            .glitch-text {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Canvas para a animação do Matrix -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Relógio Digital -->
+    <div id="horario" class="hidden sm:block">
+        <span id="horario-value"></span>
+    </div>
+
+    <!-- Container principal que envolve o menu e os anúncios -->
+    <div id="main-content-container">
+        <!-- ANÚNCIO SUPERIOR PARA MOBILE -->
+        <div id="ad-top-mobile" class="ad-container">
+            <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
+            <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
+                <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
+                <img src="image_5c5465.png-2717e69f-4e42-40f0-b3a0-4ccdf0979dbe" alt="Sua foto de anúncio">
+            </a>
+        </div>
+
+        <!-- ANÚNCIO DA ESQUERDA PARA DESKTOP -->
+        <div id="ad-left-desktop" class="ad-container">
+            <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
+            <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
+                <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
+                <img src="image_5c5465.png-2717e69f-4e42-40f0-b3a0-4ccdf0979dbe" alt="Sua foto de anúncio">
+            </a>
+        </div>
+
+        <!-- Menu de configuração inicial -->
+        <div id="menu-container">
+            <h1 class="matrix-title">CONFIGURAÇÕES MATRIX</h1>
+            
+            <div class="mt-8 mb-4">
+                <label for="color_choice" class="form-label">Cor do Efeito:</label>
+                <input type="color" id="color_choice" class="form-color" value="#00ff00">
+            </div>
+
+            <div class="mb-4">
+                <label for="speed_choice" class="form-label">Velocidade da Animação:</label>
+                <select id="speed_choice" class="form-select">
+                    <option value="80">Lenta</option>
+                    <option value="30" selected>Normal</option>
+                    <option value="10">Rápida</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="char_choice" class="form-label">Tipo de Caracteres:</label>
+                <select id="char_choice" class="form-select">
+                    <option value="1">Somente Binário (0s e 1s)</option>
+                    <option value="2" selected>Binário com Símbolos</option>
+                    <option value="3">Binário, Símbolos e Katakana</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="font_size" class="form-label">Tamanho da Fonte:</label>
+                <input type="range" id="font_size" class="form-range" min="10" max="30" value="15">
+            </div>
+
+            <div class="mb-6">
+                <label for="user_name" class="form-label">Digite seu nome:</label>
+                <input type="text" id="user_name" class="form-input" placeholder="Seu nome">
+            </div>
+            
+            <div id="donation-area">
+                <h3 class="text-xl font-bold">Apoie o site com um PIX!</h3>
+                <p id="pix-key" class="text-sm">Chave PIX: (91) 98108-5986</p>
+                <p class="text-xs">Obrigado por ajudar a manter o projeto!</p>
+                <p class="text-xs">Sandro Cardaeal</p>
+            </div>
+            
+            <button id="start-button" class="form-button mt-6">Iniciar Matrix</button>
+        </div>
+
+        <!-- ANÚNCIO DA DIREITA PARA DESKTOP -->
+        <div id="ad-right-desktop" class="ad-container">
+            <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
+            <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
+                <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
+                <img src="image_5c5465.png-2717e69f-4e42-40f0-b3a0-4ccdf0979dbe" alt="Sua foto de anúncio">
+            </a>
+        </div>
+        
+        <!-- ANÚNCIO INFERIOR PARA MOBILE -->
+        <div id="ad-bottom-mobile" class="ad-container">
+            <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
+            <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
+                <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
+                <img src="image_5c5465.png-2717e69f-4e42-40f0-b3a0-4ccdf0979dbe" alt="Sua foto de anúncio">
+            </a>
+        </div>
+    </div>
+
+    <!-- Message Box para feedback do usuário -->
+    <div id="message-box" class="message-box"></div>
+
+    <!-- Controles -->
+    <div id="controls-container">
+        <button id="pause-button">
+            <!-- Ícone de Pausar/Retomar -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14.25 7.5L18 12l-3.75 4.5M20 12a8 8 0 11-16 0 8 8 0 0116 0z"/>
+            </svg>
+            <span class="text-base">Pausar</span>
+            <span class="glitch-text">Pausar</span>
+        </button>
+        <button id="reset-button">
+            <!-- Ícone de Reiniciar -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16.03 16.5H7.97a.75.75 0 010-1.5h8.06a.75.75 0 010 1.5zM12 12.75a.75.75 0 010-1.5h.008a.75.75 0 010 1.5H12zM7.97 8.25H16.03a.75.75 0 000-1.5H7.97a.75.75 0 000 1.5z"/>
+            </svg>
+            <span class="text-base">Reiniciar</span>
+            <span class="glitch-text">Reiniciar</span>
+        </button>
+        <button id="record-button">
+            <!-- Ícone de Gravação -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/>
+                <path fill-rule="evenodd" d="M9.548 3.513A1.75 1.75 0 0111.25 2h1.5a1.75 1.75 0 011.702 1.513l.802 2.684a.75.75 0 00.57.518l2.766.425a1.75 1.75 0 011.295 1.748l-.48 2.531c-.066.347.039.704.283.957l1.83 1.895c.706.73-.207 2.072-1.267 2.22l-2.716.402a.75.75 0 00-.568.52l-.802 2.686A1.75 1.75 0 0112.75 22h-1.5a1.75 1.75 0 01-1.702-1.513l-.802-2.684a.75.75 0 00-.57-.518l-2.766-.425a1.75 1.75 0 01-1.295-1.748l.48-2.531a.75.75 0 00-.283-.957l-1.83-1.895c-.706-.73.207-2.072 1.267-2.22l2.716-.402a.75.75 0 00.568-.52l.802-2.686z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-base">Baixar Vídeo</span>
+            <span class="glitch-text">Gravar</span>
+        </button>
+        <button id="stop-record-button" disabled>
+            <!-- Ícone de Parar Gravação -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.5 7.5a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-base">Parar Gravação</span>
+            <span class="glitch-text">Parar</span>
+        </button>
+        <button id="menu-toggle-button">
+            <!-- Ícone do Menu -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
+            </svg>
+            <span class="text-base">Esconder Menu</span>
+            <span class="glitch-text">Menu</span>
+        </button>
+    </div>
+
+    <div id="visitor-counter">
+        <span>Visitantes: </span>
+        <span id="counter-value">Carregando...</span>
+    </div>
+</div>
+
+<script>
+    // Configurações do canvas
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+    
+    // Variáveis de configuração
+    let textColor = '#00ff00';
+    let pauseTime = 30;
+    let charSetSize = 2;
+    let fontSize = 15;
+    let userName = '';
+    let names = ['Neo', 'Morpheus', 'Trinity', 'Agente Smith', 'Oraculo'];
+    
+    // Declarações globais dos elementos do formulário
+    const colorChoice = document.getElementById('color_choice');
+    const speedChoice = document.getElementById('speed_choice');
+    const charChoice = document.getElementById('char_choice');
+    const fontSizeInput = document.getElementById('font_size');
+    const userNameInput = document.getElementById('user_name');
+    
+    // Mapeamento de caracteres para binário
+    const binary_db = {
+        'A': '01000001', 'B': '01000010', 'C': '01000011', 'D': '01000100',
+        'E': '01000101', 'F': '01000110', 'G': '01000111', 'H': '01001000',
+        'I': '01001001', 'J': '01001010', 'K': '01001011', 'L': '01001100',
+        'M': '01001101', 'N': '01001110', 'O': '01001111', 'P': '01010000',
+        'Q': '01010001', 'R': '01010010', 'S': '01010011', 'T': '01010100',
+        'U': '01010101', 'V': '01010110', 'W': '01010111', 'X': '01011000',
+        'Y': '01011001', 'Z': '01011010', '0': '00110000', '1': '00110001',
+        '2': '00110010', '3': '00110011', '4': '00110100', '5': '00110101',
+        '6': '00110110', '7': '00110111', '8': '00111000', '9': '00111001',
+        ' ': '00100000'
+    };
+
+    const drops = [];
+    let columns = Math.floor(width / fontSize);
+    for (let i = 0; i < columns; i++) {
+        drops[i] = 1;
+    }
+
+    const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&()カセコ';
+    const matrixChars = {
+        1: '01',
+        2: '01@#$%^&()',
+        3: characters
+    };
+
+    let secretMessageCounter = 0;
+    const secretMessageTrigger = 200;
+    let startTime = 0;
+    let animationFrameId;
+    let isPaused = false;
+    let typedChars = [];
+    
+    // Variável de estado para a mensagem secreta
+    let isSecretMessageVisible = false;
+    
+    // Variáveis para a gravação de vídeo
+    let mediaRecorder;
+    let recordedChunks = [];
+    let isRecording = false;
+    // Defina uma taxa de bits mais alta para melhorar a qualidade do vídeo (15 Mbps)
+    const videoBitrate = 15000000;
+
+    // Converte o nome do usuário para binário
+    function convertNameToBinary(name) {
+        if (!name) return ' ';
+        let binary_string = '';
+        const upperCaseName = name.toUpperCase();
+        for (let i = 0; i < upperCaseName.length; i++) {
+            const char = upperCaseName[i];
+            binary_string += binary_db[char] || '00100000';
+            binary_string += ' ';
+        }
+        return binary_string;
+    }
+
+    // Função auxiliar para desenhar um retângulo arredondado
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+    }
+
+    // Função principal de desenho do frame
+    function drawFrame(targetCtx, targetWidth, targetHeight, dropsState, fontScale = 1, showUI = true) {
+        targetCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+        
+        if (Math.random() < 0.05) {
+            targetCtx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.5)`;
+            targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+        }
+
+        const currentFontSize = fontSize * fontScale;
+        targetCtx.fillStyle = textColor;
+        targetCtx.font = `${currentFontSize}px Monospace`;
+        
+        const currentColumns = Math.floor(targetWidth / currentFontSize);
+        
+        for (let i = 0; i < currentColumns; i++) {
+            let text = '';
+            if (typedChars.length > 0 && Math.random() < 0.1) {
+                text = typedChars.shift();
+            } else if (Math.random() < 1 / 5) {
+                const nameIndex = Math.floor(Math.random() * names.length);
+                const binaryName = convertNameToBinary(names[nameIndex]);
+                text = binaryName;
+            } else {
+                const charSet = matrixChars[charSetSize];
+                text = charSet.charAt(Math.floor(Math.random() * charSet.length));
+            }
+
+            const dropIndex = i % dropsState.length;
+            targetCtx.fillText(text, i * currentFontSize, dropsState[dropIndex] * currentFontSize);
+
+            if (!isPaused) {
+                if (drops[i] * fontSize > height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        if (showUI) {
+            const elapsedTime = Math.floor((performance.now() - startTime) / 1000);
+            targetCtx.fillStyle = textColor;
+            targetCtx.font = `${16 * fontScale}px Inter`;
+            targetCtx.fillText(`Tempo decorrido: ${elapsedTime}s`, 20 * fontScale, 30 * fontScale);
+
+            if (isSecretMessageVisible) {
+                drawSecretMessage(targetCtx, targetWidth, targetHeight, fontScale);
+            }
+        }
+    }
+
+    // Desenha a mensagem secreta na tela
+    function drawSecretMessage(targetCtx, targetWidth, targetHeight, fontScale) {
+        if (userName.trim() === '') return;
+
+        const binaryName = convertNameToBinary(userName);
+        const firstLine = 'O Seu código na matrix:';
+        const secondLine = binaryName;
+        
+        // Ajustando o padding para deixar a caixa menor
+        const paddingX = 20 * fontScale; // Padding horizontal
+        const paddingY = 20 * fontScale; // Padding vertical
+        const lineSpacing = 10 * fontScale;
+        const cornerRadius = 10 * fontScale;
+        
+        // Ajustando o tamanho da fonte para ser menor
+        const firstLineFontSize = 1.0 * fontSize * fontScale;
+        const secondLineFontSize = 0.8 * fontSize * fontScale;
+
+        // Medindo o texto para criar uma caixa dinâmica
+        targetCtx.font = `${firstLineFontSize}px bold Inter`;
+        const firstLineWidth = targetCtx.measureText(firstLine).width;
+        targetCtx.font = `${secondLineFontSize}px bold Inter`;
+        const secondLineWidth = targetCtx.measureText(secondLine).width;
+        
+        const boxWidth = Math.max(firstLineWidth, secondLineWidth) + paddingX * 2;
+        const boxHeight = firstLineFontSize + secondLineFontSize + lineSpacing + paddingY * 2;
+        
+        const boxX = (targetWidth / 2) - (boxWidth / 2);
+        const boxY = (targetHeight / 2) - (boxHeight / 2);
+
+        // Desenha o fundo preto com cantos arredondados
+        targetCtx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        drawRoundedRect(targetCtx, boxX, boxY, boxWidth, boxHeight, cornerRadius);
+        targetCtx.fill();
+
+        // Animação da borda pulsante
+        const pulseAlpha = (Math.sin(performance.now() / 200) + 1) / 2; // de 0 a 1
+        targetCtx.strokeStyle = `rgba(255, 255, 255, ${0.5 + 0.5 * pulseAlpha})`;
+        targetCtx.lineWidth = 2 * fontScale;
+        drawRoundedRect(targetCtx, boxX, boxY, boxWidth, boxHeight, cornerRadius);
+        targetCtx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Efeito de glitch no texto
+        const glitchOffset = Math.random() < 0.1 ? Math.random() * 5 * fontScale : 0;
+        const glitchColor = Math.random() < 0.1 ? 'red' : '#fff';
+        
+        ctx.fillStyle = glitchColor;
+        ctx.font = `${firstLineFontSize}px bold Inter`;
+        
+        // Posicionando as linhas de texto dentro do quadrado
+        const totalTextHeight = firstLineFontSize + lineSpacing + secondLineFontSize;
+        const startY = boxY + (boxHeight / 2) - (totalTextHeight / 2);
+        
+        ctx.fillText(firstLine, targetWidth / 2 + glitchOffset, startY + firstLineFontSize / 2 + glitchOffset);
+
+        ctx.fillStyle = 'yellow';
+        ctx.font = `${secondLineFontSize}px bold Inter`;
+        ctx.fillText(secondLine, targetWidth / 2 - glitchOffset, startY + firstLineFontSize + lineSpacing + secondLineFontSize / 2 - glitchOffset);
+    }
+    
+    // Atualiza a posição das gotas de texto
+    function updateDrops() {
+        for (let i = 0; i < drops.length; i++) {
+            if (drops[i] * fontSize > height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+
+    // Loop principal da animação
+    function draw() {
+        if (isPaused) return;
+        updateDrops();
+        drawFrame(ctx, width, height, drops, 1, true);
+
+        secretMessageCounter++;
+        if (secretMessageCounter >= secretMessageTrigger) {
+            isSecretMessageVisible = true;
+            setTimeout(() => { isSecretMessageVisible = false; }, 5000);
+            secretMessageCounter = 0;
+        }
+
+        setTimeout(() => {
+            animationFrameId = requestAnimationFrame(draw);
+        }, pauseTime);
+    }
+
+    // Salva as configurações no Local Storage
+    function saveSettings() {
+        const settings = {
+            textColor: colorChoice.value,
+            pauseTime: speedChoice.value,
+            charSetSize: charChoice.value,
+            fontSize: fontSizeInput.value,
+            userName: userNameInput.value
+        };
+        localStorage.setItem('matrixSettings', JSON.stringify(settings));
+    }
+
+    // Carrega as configurações do Local Storage
+    function loadSettings() {
+        const settings = JSON.parse(localStorage.getItem('matrixSettings'));
+        if (settings) {
+            colorChoice.value = settings.textColor;
+            textColor = settings.textColor;
+            speedChoice.value = settings.pauseTime;
+            pauseTime = parseInt(settings.pauseTime, 10);
+            charChoice.value = settings.charSetSize;
+            charSetSize = parseInt(settings.charSetSize, 10);
+            fontSizeInput.value = settings.fontSize;
+            fontSize = parseInt(settings.fontSize, 10);
+            userNameInput.value = settings.userName;
+            userName = settings.userName;
+            
+            columns = Math.floor(width / fontSize);
+            drops.length = 0;
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+        }
+    }
+    
+    // Incrementa o contador de visitantes
+    function incrementVisitorCount() {
+        let count = parseInt(localStorage.getItem('visitorCount')) || 0;
+        count++;
+        localStorage.setItem('visitorCount', count);
+        return count;
+    }
+
+    // Atualiza o display do contador de visitantes
+    function updateVisitorCounterDisplay() {
+        const count = localStorage.getItem('visitorCount') || 0;
+        document.getElementById('counter-value').innerText = count;
+    }
+
+    // Atualiza o relógio digital
+    function atualizarRelogio() {
+        const horarioElemento = document.getElementById('horario-value');
+        const agora = new Date();
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        const segundos = String(agora.getSeconds()).padStart(2, '0');
+        horarioElemento.textContent = `${horas}:${minutos}:${segundos}`;
+    }
+    
+    /**
+     * Exibe uma mensagem de feedback para o usuário.
+     * @param {string} message - A mensagem a ser exibida.
+     * @param {string} type - O tipo de mensagem ('info', 'success', 'error').
+     */
+    function showMessage(message, type = 'info') {
+        const messageBox = document.getElementById('message-box');
+        if (messageBox) {
+            messageBox.textContent = message;
+            messageBox.classList.remove('info', 'error', 'success');
+            messageBox.classList.add(type, 'active');
+            setTimeout(() => {
+                messageBox.classList.remove('active');
+            }, 3000);
+        }
+    }
+
+    // Inicia a gravação do vídeo
+    function startRecording() {
+        if (isRecording) {
+            showMessage("A gravação já está em andamento.", 'info');
+            return;
+        }
+
+        try {
+            const stream = canvas.captureStream(60); 
+            recordedChunks = [];
+            
+            const options = { mimeType: 'video/webm; codecs=vp9', bitsPerSecond: videoBitrate };
+            
+            mediaRecorder = new MediaRecorder(stream, options);
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    recordedChunks.push(e.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                document.body.appendChild(a);
+                a.style = 'display: none';
+                a.href = url;
+                a.download = 'matrix.webm';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                showMessage("Gravação finalizada e vídeo pronto para download!", 'success');
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            document.getElementById('record-button').disabled = true;
+            document.getElementById('stop-record-button').disabled = false;
+            showMessage("Gravação iniciada.", 'success');
+        } catch (error) {
+            console.error('Erro ao iniciar a gravação:', error);
+            showMessage("Não foi possível iniciar a gravação. Verifique as permissões do navegador.", 'error');
+        }
+    }
+
+    // Para a gravação do vídeo
+    function stopRecording() {
+        if (!isRecording) {
+            showMessage("A gravação não está em andamento.", 'info');
+            return;
+        }
+
+        mediaRecorder.stop();
+        isRecording = false;
+        document.getElementById('record-button').disabled = false;
+        document.getElementById('stop-record-button').disabled = true;
+    }
+
+    function init() {
+        loadSettings();
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            columns = Math.floor(width / fontSize);
+            drops.length = 0;
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+        });
+
+        const menuContainer = document.getElementById('menu-container');
+        const controlsContainer = document.getElementById('controls-container');
+        const startButton = document.getElementById('start-button');
+        const pauseButton = document.getElementById('pause-button');
+        const resetButton = document.getElementById('reset-button');
+        const recordButton = document.getElementById('record-button');
+        const stopRecordButton = document.getElementById('stop-record-button');
+        const menuToggleButton = document.getElementById('menu-toggle-button');
+        
+        colorChoice.addEventListener('input', (e) => {
+            textColor = e.target.value;
+            saveSettings();
+        });
+        speedChoice.addEventListener('change', (e) => {
+            pauseTime = parseInt(e.target.value, 10);
+            saveSettings();
+        });
+        charChoice.addEventListener('change', (e) => {
+            charSetSize = parseInt(e.target.value, 10);
+            saveSettings();
+        });
+        fontSizeInput.addEventListener('input', (e) => {
+            fontSize = parseInt(e.target.value, 10);
+            columns = Math.floor(width / fontSize);
+            drops.length = 0;
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+            saveSettings();
+        });
+        userNameInput.addEventListener('input', () => {
+            saveSettings();
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (controlsContainer.style.display === 'flex' && !isPaused) {
+                typedChars.push(e.key.toUpperCase());
+            }
+        });
+
+        startButton.addEventListener('click', () => {
+            document.getElementById('main-content-container').style.display = 'none';
+            controlsContainer.style.display = 'flex';
+            document.getElementById('horario').style.display = 'block';
+            document.getElementById('visitor-counter').style.display = 'block';
+
+            userName = userNameInput.value;
+            if (userName.trim() !== '') {
+                names.push(userName);
+            }
+            startTime = performance.now();
+            draw();
+        });
+
+        pauseButton.addEventListener('click', () => {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M14.25 7.5L18 12l-3.75 4.5M20 12a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span class="text-base">Retomar</span><span class="glitch-text">Retomar</span>`;
+                cancelAnimationFrame(animationFrameId);
+            } else {
+                pauseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.75 3a.75.75 0 00-.75-.75H9a.75.75 0 00-.75.75v1.5a.75.75 0 001.5 0V4.5a.75.75 0 01.75-.75h4.5a.75.75 0 01.75.75v1.5a.75.75 0 001.5 0V3zM12 21a9 9 0 100-18 9 9 0 000 18zm-.75-7.5a.75.75 0 011.5 0v3.75a.75.75 0 01-1.5 0v-3.75z"/></svg><span class="text-base">Pausar</span><span class="glitch-text">Pausar</span>`;
+                draw();
+            }
+        });
+
+        resetButton.addEventListener('click', () => {
+            isPaused = true;
+            cancelAnimationFrame(animationFrameId);
+            document.getElementById('main-content-container').style.display = 'flex';
+            controlsContainer.style.display = 'none';
+            document.getElementById('horario').style.display = 'none';
+            document.getElementById('visitor-counter').style.display = 'none';
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+            for (let i = 0; i < drops.length; i++) {
+                drops[i] = 1;
+            }
+            typedChars = [];
+            pauseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M14.25 7.5L18 12l-3.75 4.5M20 12a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span class="text-base">Pausar</span><span class="glitch-text">Pausar</span>`;
+        });
+
+        recordButton.addEventListener('click', startRecording);
+        stopRecordButton.addEventListener('click', stopRecording);
+
+        menuToggleButton.addEventListener('click', () => {
+            if (document.getElementById('main-content-container').style.display === 'none') {
+                document.getElementById('main-content-container').style.display = 'flex';
+                menuToggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/></svg><span class="text-base">Esconder Menu</span><span class="glitch-text">Menu</span>`;
+            } else {
+                document.getElementById('main-content-container').style.display = 'none';
+                menuToggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/></svg><span class="text-base">Mostrar Menu</span><span class="glitch-text">Menu</span>`;
+            }
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        incrementVisitorCount();
+        updateVisitorCounterDisplay();
+        atualizarRelogio();
+        setInterval(atualizarRelogio, 1000);
+        init();
+    });
+</script>
+</body>
+</html>
+
+<p class="text-xs">Dicas e Reclamaçoes : Sandro21_cardeal@hotmail.COM</p
 --- a/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
 +++ b/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
 @@ -1,4 +1,4 @@@echo off
