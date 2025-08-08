@@ -110,12 +110,13 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            display: none;
+            display: flex;
             gap: 1rem;
             justify-content: center;
             align-items: center;
-            width: 90%; /* Ajusta a largura em telas menores */
+            width: 90%;
             max-width: 600px;
+            flex-wrap: wrap; /* Adicionado para que os botões quebrem a linha */
         }
         #controls-container button {
             padding: 0.75rem 1.5rem;
@@ -126,16 +127,16 @@
             border: 2px solid #0f0;
             transition: all 0.2s ease;
             cursor: pointer;
-            flex-grow: 1; /* Permite que os botões cresçam */
-            min-width: 0; /* Evita que o flexbox crie overflow */
-            font-size: 0.75rem; /* Reduz o tamanho da fonte para telas pequenas */
+            flex-grow: 1;
+            min-width: 0;
+            font-size: 0.75rem;
         }
         #controls-container button:hover {
             background: rgba(15, 255, 0, 0.8);
             box-shadow: 0 0 10px #0f0;
         }
         .ad-container {
-            display: none; /* Oculta por padrão */
+            display: none;
         }
         .ad-link {
             display: block;
@@ -161,11 +162,11 @@
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #0f0;
             color: #0f0;
-            padding: 0.5rem 1rem; /* Reduz o padding para telas pequenas */
+            padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             top: 1rem;
             right: 1rem;
-            font-size: 1rem; /* Reduz o tamanho da fonte */
+            font-size: 1rem;
         }
         #horario {
             position: absolute;
@@ -173,11 +174,11 @@
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #0f0;
             color: #0f0;
-            padding: 0.5rem 1rem; /* Reduz o padding para telas pequenas */
+            padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             top: 1rem;
             left: 1rem;
-            font-size: 1rem; /* Reduz o tamanho da fonte */
+            font-size: 1rem;
             font-family: 'Courier New', Courier, monospace;
         }
         #donation-area {
@@ -260,10 +261,10 @@
                 display: block;
             }
             #controls-container {
-                flex-wrap: wrap; /* Permite que os botões quebrem a linha */
+                flex-wrap: wrap;
             }
             #controls-container button {
-                flex-basis: calc(50% - 0.5rem); /* Dois botões por linha com espaçamento */
+                flex-basis: calc(50% - 0.5rem);
             }
         }
     </style>
@@ -493,7 +494,6 @@
                 text = charSet.charAt(Math.floor(Math.random() * charSet.length));
             }
 
-            // Garante que o índice `i` não seja maior que `dropsState.length - 1`
             const dropIndex = i % dropsState.length;
             targetCtx.fillText(text, i * currentFontSize, dropsState[dropIndex] * currentFontSize);
         }
@@ -866,6 +866,7 @@
 </script>
 </body>
 </html>
+
 
 --- a/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
 +++ b/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
