@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Efeito Matrix - HTML</title>
+    <title>Efeito Matrix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
@@ -23,12 +23,19 @@
             display: block;
             background-color: #000;
         }
-        #menu-container {
+        #main-content-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            width: 100%;
+        }
+        #menu-container {
             padding: 2rem;
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #0f0;
@@ -107,6 +114,8 @@
             gap: 1rem;
             justify-content: center;
             align-items: center;
+            width: 90%; /* Ajusta a largura em telas menores */
+            max-width: 600px;
         }
         #controls-container button {
             padding: 0.75rem 1.5rem;
@@ -117,18 +126,34 @@
             border: 2px solid #0f0;
             transition: all 0.2s ease;
             cursor: pointer;
+            flex-grow: 1; /* Permite que os botões cresçam */
+            min-width: 0; /* Evita que o flexbox crie overflow */
+            font-size: 0.75rem; /* Reduz o tamanho da fonte para telas pequenas */
         }
         #controls-container button:hover {
             background: rgba(15, 255, 0, 0.8);
             box-shadow: 0 0 10px #0f0;
         }
-        @media (max-width: 600px) {
-            #controls-container {
-                flex-direction: column;
-            }
-            #controls-container button {
-                width: 100%;
-            }
+        .ad-container {
+            display: none; /* Oculta por padrão */
+        }
+        .ad-link {
+            display: block;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 2px solid #0f0;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .ad-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #0f0;
+        }
+        .ad-link img {
+            width: 100%;
+            height: auto;
+            display: block;
         }
         #visitor-counter {
             position: absolute;
@@ -136,11 +161,24 @@
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #0f0;
             color: #0f0;
-            padding: 1rem;
+            padding: 0.5rem 1rem; /* Reduz o padding para telas pequenas */
             border-radius: 0.5rem;
             top: 1rem;
             right: 1rem;
-            font-size: 1.25rem;
+            font-size: 1rem; /* Reduz o tamanho da fonte */
+        }
+        #horario {
+            position: absolute;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #0f0;
+            color: #0f0;
+            padding: 0.5rem 1rem; /* Reduz o padding para telas pequenas */
+            border-radius: 0.5rem;
+            top: 1rem;
+            left: 1rem;
+            font-size: 1rem; /* Reduz o tamanho da fonte */
+            font-family: 'Courier New', Courier, monospace;
         }
         #donation-area {
             margin-top: 2rem;
@@ -191,59 +229,132 @@
             50% { box-shadow: 0 0 20px #f00; }
             100% { box-shadow: 0 0 10px #f00; }
         }
+        @media (min-width: 1024px) {
+            #main-content-container {
+                flex-direction: row;
+                gap: 2rem;
+                width: auto;
+            }
+            .ad-container {
+                display: flex;
+                flex-direction: column;
+                width: 250px;
+                gap: 1rem;
+            }
+            #controls-container button {
+                font-size: 1rem;
+            }
+            #ad-top-mobile, #ad-bottom-mobile {
+                display: none;
+            }
+        }
+        @media (max-width: 1023px) {
+            #main-content-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            #ad-left-desktop, #ad-right-desktop {
+                display: none;
+            }
+            #ad-top-mobile, #ad-bottom-mobile {
+                display: block;
+            }
+            #controls-container {
+                flex-wrap: wrap; /* Permite que os botões quebrem a linha */
+            }
+            #controls-container button {
+                flex-basis: calc(50% - 0.5rem); /* Dois botões por linha com espaçamento */
+            }
+        }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <!-- Canvas para a animacao do Matrix -->
+    <!-- Canvas para a animação do Matrix -->
     <canvas id="matrixCanvas"></canvas>
 
-    <!-- Menu de configuracao inicial -->
-    <div id="menu-container">
-        <h1 class="matrix-title">CONFIGURAÇÕES MATRIX</h1>
+    <!-- Relógio Digital -->
+    <div id="horario" class="hidden sm:block">
+        <span id="horario-value"></span>
+    </div>
 
-        <div class="mb-4">
-            <label for="color_choice" class="form-label">Cor do Efeito:</label>
-            <input type="color" id="color_choice" class="form-color" value="#00ff00">
+    <!-- Container principal que envolve o menu e os anúncios -->
+    <div id="main-content-container">
+        <!-- Anúncio superior para mobile -->
+        <div id="ad-top-mobile" class="ad-container">
+            <a href="#" class="ad-link">
+                <img src="https://placehold.co/400x150/003300/ffffff?text=An%C3%BAncio+1" alt="Anúncio 1">
+            </a>
         </div>
 
-        <div class="mb-4">
-            <label for="speed_choice" class="form-label">Velocidade da Animação:</label>
-            <select id="speed_choice" class="form-select">
-                <option value="80">Lenta</option>
-                <option value="30" selected>Normal</option>
-                <option value="10">Rápida</option>
-            </select>
+        <!-- Anúncio da esquerda para desktop -->
+        <div id="ad-left-desktop" class="ad-container">
+            <a href="#" class="ad-link">
+                <img src="https://placehold.co/250x400/003300/ffffff?text=An%C3%BAncio+1" alt="Anúncio 1">
+            </a>
         </div>
 
-        <div class="mb-4">
-            <label for="char_choice" class="form-label">Tipo de Caracteres:</label>
-            <select id="char_choice" class="form-select">
-                <option value="1">Somente Binário (0s e 1s)</option>
-                <option value="2" selected>Binário com Símbolos</option>
-                <option value="3">Binário, Símbolos e Katakana</option>
-            </select>
+        <!-- Menu de configuração inicial -->
+        <div id="menu-container">
+            <h1 class="matrix-title">CONFIGURAÇÕES MATRIX</h1>
+            
+            <div class="mt-8 mb-4">
+                <label for="color_choice" class="form-label">Cor do Efeito:</label>
+                <input type="color" id="color_choice" class="form-color" value="#00ff00">
+            </div>
+
+            <div class="mb-4">
+                <label for="speed_choice" class="form-label">Velocidade da Animação:</label>
+                <select id="speed_choice" class="form-select">
+                    <option value="80">Lenta</option>
+                    <option value="30" selected>Normal</option>
+                    <option value="10">Rápida</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="char_choice" class="form-label">Tipo de Caracteres:</label>
+                <select id="char_choice" class="form-select">
+                    <option value="1">Somente Binário (0s e 1s)</option>
+                    <option value="2" selected>Binário com Símbolos</option>
+                    <option value="3">Binário, Símbolos e Katakana</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="font_size" class="form-label">Tamanho da Fonte:</label>
+                <input type="range" id="font_size" class="form-range" min="10" max="30" value="15">
+            </div>
+
+            <div class="mb-6">
+                <label for="user_name" class="form-label">Digite seu nome:</label>
+                <input type="text" id="user_name" class="form-input" placeholder="Seu nome">
+            </div>
+
+            <div id="donation-area">
+                <h3 class="text-xl font-bold">Apoie o site com um PIX!</h3>
+                <p id="pix-key" class="text-sm">Chave PIX: (91) 98108-5986</p>
+                <p class="text-xs">Obrigado por ajudar a manter o projeto!</p>
+                <p class="text-xs">Sandro Cardaeal</p>
+            </div>
+            
+            <button id="start-button" class="form-button mt-6">Iniciar Matrix</button>
         </div>
 
-        <div class="mb-4">
-            <label for="font_size" class="form-label">Tamanho da Fonte:</label>
-            <input type="range" id="font_size" class="form-range" min="10" max="30" value="15">
-        </div>
-
-        <div class="mb-6">
-            <label for="user_name" class="form-label">Digite seu nome:</label>
-            <input type="text" id="user_name" class="form-input" placeholder="Seu nome">
-        </div>
-
-        <div id="donation-area">
-            <h3 class="text-xl font-bold">Apoie o site com um PIX!</h3>
-            <p id="pix-key" class="text-sm">Chave PIX: (91) 98108-5986</p>
-            <p class="text-xs">Obrigado por ajudar a manter o projeto!</p>
-            <p class="text-xs">Sandro Cardaeal</p>
+        <!-- Anúncio da direita para desktop -->
+        <div id="ad-right-desktop" class="ad-container">
+            <a href="#" class="ad-link">
+                <img src="https://placehold.co/250x400/003300/ffffff?text=An%C3%BAncio+2" alt="Anúncio 2">
+            </a>
         </div>
         
-        <button id="start-button" class="form-button mt-6">Iniciar Matrix</button>
+        <!-- Anúncio inferior para mobile -->
+        <div id="ad-bottom-mobile" class="ad-container">
+            <a href="#" class="ad-link">
+                <img src="https://placehold.co/400x150/003300/ffffff?text=An%C3%BAncio+2" alt="Anúncio 2">
+            </a>
+        </div>
     </div>
 
     <div id="png-message">
@@ -393,7 +504,7 @@
         targetCtx.fillText(`Tempo decorrido: ${elapsedTime}s`, 20 * fontScale, 30 * fontScale);
 
         if (isSecretMessageVisible) {
-             drawSecretMessage(targetCtx, targetWidth, targetHeight, fontScale);
+            drawSecretMessage(targetCtx, targetWidth, targetHeight, fontScale);
         }
     }
 
@@ -432,7 +543,7 @@
     }
     
     function updateDrops() {
-         for (let i = 0; i < drops.length; i++) {
+        for (let i = 0; i < drops.length; i++) {
             if (drops[i] * fontSize > height && Math.random() > 0.975) {
                 drops[i] = 0;
             }
@@ -513,6 +624,15 @@
         const count = localStorage.getItem('visitorCount') || 0;
         document.getElementById('counter-value').innerText = count;
     }
+
+    function atualizarRelogio() {
+        const horarioElemento = document.getElementById('horario-value');
+        const agora = new Date();
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        const segundos = String(agora.getSeconds()).padStart(2, '0');
+        horarioElemento.textContent = `${horas}:${minutos}:${segundos}`;
+    }
     
     function startVideoRecording() {
         if (isRecordingVideo) return;
@@ -541,13 +661,13 @@
 
         // Loop de gravação em alta resolução
         const recordingLoop = () => {
-             if (!isRecordingVideo) {
+            if (!isRecordingVideo) {
                 return;
-             }
-             // Desenha um frame no canvas temporário com os drops do canvas principal
-             const fontScale = videoWidth / width;
-             drawFrame(temporaryCtx, videoWidth, videoHeight, drops, fontScale);
-             recordingAnimationFrameId = requestAnimationFrame(recordingLoop);
+            }
+            // Desenha um frame no canvas temporário com os drops do canvas principal
+            const fontScale = videoWidth / width;
+            drawFrame(temporaryCtx, videoWidth, videoHeight, drops, fontScale);
+            recordingAnimationFrameId = requestAnimationFrame(recordingLoop);
         };
         
         // Inicia o loop de gravação
@@ -648,8 +768,11 @@
         });
 
         startButton.addEventListener('click', () => {
-            menuContainer.style.display = 'none';
+            document.getElementById('main-content-container').style.display = 'none';
             controlsContainer.style.display = 'flex';
+            document.getElementById('horario').style.display = 'block';
+            document.getElementById('visitor-counter').style.display = 'block';
+
             userName = userNameInput.value;
             if (userName.trim() !== '') {
                 names.push(userName);
@@ -678,8 +801,10 @@
         resetButton.addEventListener('click', () => {
             isPaused = true;
             cancelAnimationFrame(animationFrameId);
-            menuContainer.style.display = 'block';
+            document.getElementById('main-content-container').style.display = 'flex';
             controlsContainer.style.display = 'none';
+            document.getElementById('horario').style.display = 'none';
+            document.getElementById('visitor-counter').style.display = 'none';
             if (isAudioOn) {
                 synth.triggerRelease('+0.1');
             }
@@ -704,18 +829,18 @@
         });
 
         menuToggleButton.addEventListener('click', () => {
-            if (menuContainer.style.display === 'none') {
-                menuContainer.style.display = 'block';
+            if (document.getElementById('main-content-container').style.display === 'none') {
+                document.getElementById('main-content-container').style.display = 'flex';
                 menuToggleButton.innerText = 'Esconder Menu';
             } else {
-                menuContainer.style.display = 'none';
+                document.getElementById('main-content-container').style.display = 'none';
                 menuToggleButton.innerText = 'Mostrar Menu';
             }
         });
 
         downloadPngButton.addEventListener('click', () => {
             if (isSecretMessageVisible) {
-                 drawSecretMessage(ctx, width, height, 1);
+                drawSecretMessage(ctx, width, height, 1);
             }
             
             const link = document.createElement('a');
@@ -734,11 +859,14 @@
     window.addEventListener('DOMContentLoaded', () => {
         incrementVisitorCount();
         updateVisitorCounterDisplay();
+        atualizarRelogio();
+        setInterval(atualizarRelogio, 1000);
         init();
     });
 </script>
 </body>
 </html>
+
 --- a/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
 +++ b/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
 @@ -1,4 +1,4 @@@echo off
