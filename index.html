@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Efeito Matrix</title>
+    <!-- Incluindo Tailwind CSS para estilização rápida -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
+        /* Importa a fonte Inter do Google Fonts */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
@@ -48,6 +49,7 @@
             transition: all 0.5s ease-in-out;
             display: block;
         }
+        /* Animação de pulsação para o menu */
         @keyframes pulse-green {
             0% { box-shadow: 0 0 20px #0f0, 0 0 30px #0f0 inset; }
             50% { box-shadow: 0 0 30px #0f0, 0 0 40px #0f0 inset; }
@@ -110,7 +112,7 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            display: none; /* Alterado para não aparecer no início */
+            display: none;
             gap: 1rem;
             justify-content: center;
             align-items: center;
@@ -130,23 +132,72 @@
             flex-grow: 1;
             min-width: 0;
             font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
         }
-        #controls-container button:hover {
+        #controls-container button:hover:not(:disabled) {
             background: rgba(15, 255, 0, 0.8);
             box-shadow: 0 0 10px #0f0;
         }
+        #controls-container button:disabled {
+            background: rgba(15, 255, 0, 0.2);
+            border-color: #053b05;
+            cursor: not-allowed;
+        }
+        #controls-container button svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        .glitch-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            pointer-events: none;
+            color: red;
+            opacity: 0;
+        }
+        #controls-container button:hover .glitch-text {
+            animation: glitch 0.5s infinite;
+            opacity: 1;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-2px, 2px); }
+            50% { transform: translate(2px, -2px); }
+            75% { transform: translate(-2px, -2px); }
+            100% { transform: translate(2px, 2px); }
+        }
         .ad-container {
             display: none;
+            width: 250px;
         }
         .ad-link {
-            display: block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            min-height: 150px;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.8);
             border-radius: 0.5rem;
             overflow: hidden;
             border: 2px solid #0f0;
             box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
             transition: all 0.3s ease;
-            width: 100%;
-            margin-bottom: 1rem;
+            text-align: center;
+            text-decoration: none;
         }
         .ad-link:hover {
             transform: scale(1.05);
@@ -155,7 +206,8 @@
         .ad-link img {
             width: 100%;
             height: auto;
-            display: block;
+            border-radius: 0.5rem;
+            object-fit: cover;
         }
         #visitor-counter {
             position: absolute;
@@ -182,55 +234,31 @@
             font-size: 1rem;
             font-family: 'Courier New', Courier, monospace;
         }
-        #donation-area {
-            margin-top: 1rem;
-            border-top: 1px solid #0f0;
-            padding-top: 1rem;
-            text-align: center;
-        }
-        #png-message {
+        .message-box {
             position: absolute;
             bottom: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 1.5rem;
             font-weight: bold;
-            color: #0f0;
+            color: #fff;
             background: rgba(0, 0, 0, 0.8);
             padding: 1rem;
-            border: 2px solid #0f0;
-            border-radius: 0.5rem;
-            text-align: center;
-            display: none;
-            z-index: 20;
-        }
-        #video-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #f00;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 1rem;
-            border: 2px solid #f00;
             border-radius: 0.5rem;
             text-align: center;
             display: none;
             z-index: 20;
             width: 300px;
-            animation: record-pulse 1s infinite;
+            border: 2px solid #0f0;
         }
-        #video-message span {
+        .message-box.active {
             display: block;
-            margin-top: 10px;
         }
-        @keyframes record-pulse {
-            0% { box-shadow: 0 0 10px #f00; }
-            50% { box-shadow: 0 0 20px #f00; }
-            100% { box-shadow: 0 0 10px #f00; }
-        }
+        .message-box.info { border-color: #3b82f6; color: #3b82f6; }
+        .message-box.error { border-color: #ef4444; color: #ef4444; }
+        .message-box.success { border-color: #22c55e; color: #22c55e; }
+        
+        /* Media queries para responsividade */
         @media (min-width: 1024px) {
             #main-content-container {
                 flex-direction: row;
@@ -276,10 +304,14 @@
             }
             #controls-container button {
                 flex-basis: calc(50% - 0.5rem);
+                font-size: 0.75rem;
             }
             #horario, #visitor-counter {
                 font-size: 0.8rem;
                 padding: 0.3rem 0.6rem;
+            }
+            .glitch-text {
+                font-size: 0.6rem;
             }
         }
     </style>
@@ -297,17 +329,21 @@
 
     <!-- Container principal que envolve o menu e os anúncios -->
     <div id="main-content-container">
-        <!-- Anúncio superior para mobile -->
+        <!-- ANÚNCIO SUPERIOR PARA MOBILE -->
         <div id="ad-top-mobile" class="ad-container">
-            <a href="#" class="http://www.oobet7.com/?r=yql2000 ad-link">
-                <img src="https://placehold.co/400x150/003300/ffffff?text=An%C3%BAncio+1" alt="Anúncio 1">
+            <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
+            <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
+                <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
+                <img src="imagens/minha_foto1.jpg" alt="Sua foto de anúncio">
             </a>
         </div>
 
-        <!-- Anúncio da esquerda para desktop -->
+        <!-- ANÚNCIO DA ESQUERDA PARA DESKTOP -->
         <div id="ad-left-desktop" class="ad-container">
-            <a href="#" class="http://www.oobet7.com/?r=yql2000 ad-link">
-                <img src="https://placehold.co/250x400/003300/ffffff?text=An%C3%BAncio+1" alt="Anúncio 1">
+            <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
+            <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
+                <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
+                <img src="imagens/minha_foto1.jpg" alt="Sua foto de anúncio">
             </a>
         </div>
 
@@ -347,7 +383,7 @@
                 <label for="user_name" class="form-label">Digite seu nome:</label>
                 <input type="text" id="user_name" class="form-input" placeholder="Seu nome">
             </div>
-
+            
             <div id="donation-area">
                 <h3 class="text-xl font-bold">Apoie o site com um PIX!</h3>
                 <p id="pix-key" class="text-sm">Chave PIX: (91) 98108-5986</p>
@@ -358,37 +394,71 @@
             <button id="start-button" class="form-button mt-6">Iniciar Matrix</button>
         </div>
 
-        <!-- Anúncio da direita para desktop -->
+        <!-- ANÚNCIO DA DIREITA PARA DESKTOP -->
         <div id="ad-right-desktop" class="ad-container">
-            <a href="#" class="ad-link">
-                <img src="https://placehold.co/250x400/003300/ffffff?text=An%C3%BAncio+1" alt="Anúncio 1">
+            <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
+            <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
+                <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
+                <img src="imagens/minha_foto.jpg" alt="Sua foto de anúncio">
             </a>
         </div>
         
-        <!-- Anúncio inferior para mobile -->
+        <!-- ANÚNCIO INFERIOR PARA MOBILE -->
         <div id="ad-bottom-mobile" class="ad-container">
-            <a href="#" class="ad-link">
-                <img src="https://placehold.co/400x150/003300/ffffff?text=An%C3%BAncio+2" alt="Anúncio 2">
+            <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
+            <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
+                <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
+                <img src="imagens/minha_foto.jpg" alt="Sua foto de anúncio">
             </a>
         </div>
     </div>
 
-    <div id="png-message">
-        Sua prévia PNG está sendo baixada!
-    </div>
-    <div id="video-message">
-        Gravando...
-        <span>(0s / 15s)</span>
-    </div>
+    <!-- Message Box para feedback do usuário -->
+    <div id="message-box" class="message-box"></div>
 
+    <!-- Controles -->
     <div id="controls-container">
-        <button id="pause-button">Pausar</button>
-        <button id="reset-button">Reiniciar</button>
-        <button id="audio-button">Ligar Áudio</button>
-        <button id="menu-toggle-button">Esconder Menu</button>
-        <button id="download-png-button">Baixar PNG</button>
-        <button id="record-video-button">Gravar Vídeo (1080p)</button>
-        <button id="record-video-2k-button">Gravar Vídeo (2K)</button>
+        <button id="pause-button">
+            <!-- Ícone de Pausar/Retomar -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14.25 7.5L18 12l-3.75 4.5M20 12a8 8 0 11-16 0 8 8 0 0116 0z"/>
+            </svg>
+            <span class="text-base">Pausar</span>
+            <span class="glitch-text">Pausar</span>
+        </button>
+        <button id="reset-button">
+            <!-- Ícone de Reiniciar -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16.03 16.5H7.97a.75.75 0 010-1.5h8.06a.75.75 0 010 1.5zM12 12.75a.75.75 0 010-1.5h.008a.75.75 0 010 1.5H12zM7.97 8.25H16.03a.75.75 0 000-1.5H7.97a.75.75 0 000 1.5z"/>
+            </svg>
+            <span class="text-base">Reiniciar</span>
+            <span class="glitch-text">Reiniciar</span>
+        </button>
+        <button id="record-button">
+            <!-- Ícone de Gravação -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/>
+                <path fill-rule="evenodd" d="M9.548 3.513A1.75 1.75 0 0111.25 2h1.5a1.75 1.75 0 011.702 1.513l.802 2.684a.75.75 0 00.57.518l2.766.425a1.75 1.75 0 011.295 1.748l-.48 2.531c-.066.347.039.704.283.957l1.83 1.895c.706.73-.207 2.072-1.267 2.22l-2.716.402a.75.75 0 00-.568.52l-.802 2.686A1.75 1.75 0 0112.75 22h-1.5a1.75 1.75 0 01-1.702-1.513l-.802-2.684a.75.75 0 00-.57-.518l-2.766-.425a1.75 1.75 0 01-1.295-1.748l.48-2.531a.75.75 0 00-.283-.957l-1.83-1.895c-.706-.73.207-2.072 1.267-2.22l2.716-.402a.75.75 0 00.568-.52l.802-2.686z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-base">Baixar Vídeo</span>
+            <span class="glitch-text">Gravar</span>
+        </button>
+        <button id="stop-record-button" disabled>
+            <!-- Ícone de Parar Gravação -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.5 7.5a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-base">Parar Gravação</span>
+            <span class="glitch-text">Parar</span>
+        </button>
+        <button id="menu-toggle-button">
+            <!-- Ícone do Menu -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
+            </svg>
+            <span class="text-base">Esconder Menu</span>
+            <span class="glitch-text">Menu</span>
+        </button>
     </div>
 
     <div id="visitor-counter">
@@ -419,6 +489,7 @@
     const fontSizeInput = document.getElementById('font_size');
     const userNameInput = document.getElementById('user_name');
     
+    // Mapeamento de caracteres para binário
     const binary_db = {
         'A': '01000001', 'B': '01000010', 'C': '01000011', 'D': '01000100',
         'E': '01000101', 'F': '01000110', 'G': '01000111', 'H': '01001000',
@@ -433,7 +504,7 @@
     };
 
     const drops = [];
-    let columns = width / fontSize;
+    let columns = Math.floor(width / fontSize);
     for (let i = 0; i < columns; i++) {
         drops[i] = 1;
     }
@@ -450,26 +521,19 @@
     let startTime = 0;
     let animationFrameId;
     let isPaused = false;
-    let isAudioOn = false;
     let typedChars = [];
-    
-    // Variáveis para a gravação de vídeo
-    let mediaRecorder;
-    let videoChunks = [];
-    const videoDuration = 15000;
-    let isRecordingVideo = false;
-    let recordingStartTime = 0;
-    let recordingOffscreenCanvas;
     
     // Variável de estado para a mensagem secreta
     let isSecretMessageVisible = false;
     
-    const synth = new Tone.PolySynth(Tone.Synth, {
-        oscillator: { type: "sine" },
-        envelope: { attack: 0.1, decay: 0.2, sustain: 0.5, release: 0.5 },
-        volume: -15
-    }).toDestination();
-    
+    // Variáveis para a gravação de vídeo
+    let mediaRecorder;
+    let recordedChunks = [];
+    let isRecording = false;
+    // Defina uma taxa de bits mais alta para melhorar a qualidade do vídeo (15 Mbps)
+    const videoBitrate = 15000000;
+
+    // Converte o nome do usuário para binário
     function convertNameToBinary(name) {
         if (!name) return ' ';
         let binary_string = '';
@@ -482,8 +546,8 @@
         return binary_string;
     }
 
-    // Função de desenho genérica para ser usada tanto no canvas principal quanto no de gravação
-    function drawFrame(targetCtx, targetWidth, targetHeight, dropsState, fontScale = 1, showMessage = true) {
+    // Função principal de desenho do frame
+    function drawFrame(targetCtx, targetWidth, targetHeight, dropsState, fontScale = 1, showUI = true) {
         targetCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         targetCtx.fillRect(0, 0, targetWidth, targetHeight);
         
@@ -496,8 +560,8 @@
         targetCtx.fillStyle = textColor;
         targetCtx.font = `${currentFontSize}px Monospace`;
         
-        const currentColumns = targetWidth / currentFontSize;
-
+        const currentColumns = Math.floor(targetWidth / currentFontSize);
+        
         for (let i = 0; i < currentColumns; i++) {
             let text = '';
             if (typedChars.length > 0 && Math.random() < 0.1) {
@@ -513,9 +577,16 @@
 
             const dropIndex = i % dropsState.length;
             targetCtx.fillText(text, i * currentFontSize, dropsState[dropIndex] * currentFontSize);
+
+            if (!isPaused) {
+                if (drops[i] * fontSize > height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
         }
 
-        if (showMessage) {
+        if (showUI) {
             const elapsedTime = Math.floor((performance.now() - startTime) / 1000);
             targetCtx.fillStyle = textColor;
             targetCtx.font = `${16 * fontScale}px Inter`;
@@ -527,7 +598,10 @@
         }
     }
 
+    // Desenha a mensagem secreta na tela
     function drawSecretMessage(targetCtx, targetWidth, targetHeight, fontScale) {
+        if (userName.trim() === '') return;
+
         const binaryName = convertNameToBinary(userName);
         const firstLine = 'O Seu código na matrix:';
         const secondLine = binaryName;
@@ -545,22 +619,23 @@
         const boxY = (targetHeight / 2) - (boxHeight / 2);
 
         targetCtx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        targetCtx.fillRect(boxX, boxY, boxWidth, boxHeight);
-        targetCtx.strokeStyle = '#fff';
-        targetCtx.lineWidth = 2 * fontScale;
-        targetCtx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2 * fontScale;
+        ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
 
-        targetCtx.textAlign = 'center';
-        targetCtx.textBaseline = 'middle';
-        targetCtx.fillStyle = '#fff';
-        targetCtx.font = `${2 * fontSize * fontScale}px bold Inter`;
-        targetCtx.fillText(firstLine, targetWidth / 2, boxY + 30 * fontScale);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#fff';
+        ctx.font = `${2 * fontSize * fontScale}px bold Inter`;
+        ctx.fillText(firstLine, targetWidth / 2, boxY + 30 * fontScale);
 
-        targetCtx.fillStyle = 'yellow';
-        targetCtx.font = `${1.5 * fontSize * fontScale}px bold Inter`;
-        targetCtx.fillText(secondLine, targetWidth / 2, boxY + 30 * fontScale + 40 * fontScale);
+        ctx.fillStyle = 'yellow';
+        ctx.font = `${1.5 * fontSize * fontScale}px bold Inter`;
+        ctx.fillText(secondLine, targetWidth / 2, boxY + 30 * fontScale + 40 * fontScale);
     }
     
+    // Atualiza a posição das gotas de texto
     function updateDrops() {
         for (let i = 0; i < drops.length; i++) {
             if (drops[i] * fontSize > height && Math.random() > 0.975) {
@@ -570,16 +645,12 @@
         }
     }
 
+    // Loop principal da animação
     function draw() {
         if (isPaused) return;
-
-        // Atualiza o estado da animação
         updateDrops();
-
-        // Desenha na tela principal
         drawFrame(ctx, width, height, drops, 1, true);
 
-        // Atualiza o contador de mensagens secretas
         secretMessageCounter++;
         if (secretMessageCounter >= secretMessageTrigger) {
             isSecretMessageVisible = true;
@@ -587,18 +658,12 @@
             secretMessageCounter = 0;
         }
 
-        // Se estiver gravando, atualiza a mensagem na tela
-        if (isRecordingVideo) {
-            const videoMessageSpan = document.querySelector('#video-message span');
-            const remainingTime = Math.max(0, Math.floor((videoDuration - (performance.now() - recordingStartTime)) / 1000));
-            videoMessageSpan.innerText = `(${remainingTime}s / 15s)`;
-        }
-
         setTimeout(() => {
             animationFrameId = requestAnimationFrame(draw);
         }, pauseTime);
     }
 
+    // Salva as configurações no Local Storage
     function saveSettings() {
         const settings = {
             textColor: colorChoice.value,
@@ -610,6 +675,7 @@
         localStorage.setItem('matrixSettings', JSON.stringify(settings));
     }
 
+    // Carrega as configurações do Local Storage
     function loadSettings() {
         const settings = JSON.parse(localStorage.getItem('matrixSettings'));
         if (settings) {
@@ -623,8 +689,8 @@
             fontSize = parseInt(settings.fontSize, 10);
             userNameInput.value = settings.userName;
             userName = settings.userName;
-
-            columns = width / fontSize;
+            
+            columns = Math.floor(width / fontSize);
             drops.length = 0;
             for (let i = 0; i < columns; i++) {
                 drops[i] = 1;
@@ -632,6 +698,7 @@
         }
     }
     
+    // Incrementa o contador de visitantes
     function incrementVisitorCount() {
         let count = parseInt(localStorage.getItem('visitorCount')) || 0;
         count++;
@@ -639,11 +706,13 @@
         return count;
     }
 
+    // Atualiza o display do contador de visitantes
     function updateVisitorCounterDisplay() {
         const count = localStorage.getItem('visitorCount') || 0;
         document.getElementById('counter-value').innerText = count;
     }
 
+    // Atualiza o relógio digital
     function atualizarRelogio() {
         const horarioElemento = document.getElementById('horario-value');
         const agora = new Date();
@@ -653,115 +722,80 @@
         horarioElemento.textContent = `${horas}:${minutos}:${segundos}`;
     }
     
-    function startVideoRecording(resolution) {
-        if (isRecordingVideo) return;
+    /**
+     * Exibe uma mensagem de feedback para o usuário.
+     * @param {string} message - A mensagem a ser exibida.
+     * @param {string} type - O tipo de mensagem ('info', 'success', 'error').
+     */
+    function showMessage(message, type = 'info') {
+        const messageBox = document.getElementById('message-box');
+        if (messageBox) {
+            messageBox.textContent = message;
+            messageBox.classList.remove('info', 'error', 'success');
+            messageBox.classList.add(type, 'active');
+            setTimeout(() => {
+                messageBox.classList.remove('active');
+            }, 3000);
+        }
+    }
 
-        isRecordingVideo = true;
-        
-        const videoMessage = document.getElementById('video-message');
-        videoMessage.style.display = 'block';
-        
-        const controlsContainer = document.getElementById('controls-container');
-        const recordVideoButton = document.getElementById('record-video-button');
-        const recordVideo2KButton = document.getElementById('record-video-2k-button');
-        controlsContainer.style.pointerEvents = 'none';
-        recordVideoButton.disabled = true;
-        recordVideo2KButton.disabled = true;
-        
-        let videoWidth, videoHeight;
-        if (resolution === '2k') {
-            videoWidth = 2560;
-            videoHeight = 1440;
-        } else {
-            videoWidth = 1920;
-            videoHeight = 1080;
+    // Inicia a gravação do vídeo
+    function startRecording() {
+        if (isRecording) {
+            showMessage("A gravação já está em andamento.", 'info');
+            return;
         }
 
-        const videoBitrate = 15000000;
-        
         try {
-            if (typeof OffscreenCanvas !== 'undefined') {
-                recordingOffscreenCanvas = new OffscreenCanvas(videoWidth, videoHeight);
-            } else {
-                // Fallback para navegadores sem OffscreenCanvas
-                recordingOffscreenCanvas = document.createElement('canvas');
-                recordingOffscreenCanvas.width = videoWidth;
-                recordingOffscreenCanvas.height = videoHeight;
-            }
-            const offscreenCtx = recordingOffscreenCanvas.getContext('2d');
+            const stream = canvas.captureStream(60); 
+            recordedChunks = [];
             
-            let recordingAnimationFrameId;
+            const options = { mimeType: 'video/webm; codecs=vp9', bitsPerSecond: videoBitrate };
+            
+            mediaRecorder = new MediaRecorder(stream, options);
 
-            // Loop de gravação em alta resolução
-            const recordingLoop = () => {
-                if (!isRecordingVideo) {
-                    return;
-                }
-                // Desenha um frame no offscreen canvas
-                const fontScale = videoWidth / width;
-                drawFrame(offscreenCtx, videoWidth, videoHeight, drops, fontScale, true);
-                
-                // Grava o frame no stream
-                if (mediaRecorder.state === 'recording') {
-                    // This is a simple way to push frames, may need optimization
-                }
-                
-                recordingAnimationFrameId = requestAnimationFrame(recordingLoop);
-            };
-            
-            recordingAnimationFrameId = requestAnimationFrame(recordingLoop);
-
-            const videoStream = recordingOffscreenCanvas.captureStream();
-            mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm', videoBitsPerSecond: videoBitrate });
-            
-            videoChunks = [];
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    videoChunks.push(event.data);
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    recordedChunks.push(e.data);
                 }
             };
 
             mediaRecorder.onstop = () => {
-                cancelAnimationFrame(recordingAnimationFrameId);
-                const blob = new Blob(videoChunks, { type: 'video/webm' });
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
+                document.body.appendChild(a);
+                a.style = 'display: none';
                 a.href = url;
-                a.download = `matrix-video-${resolution}.webm`;
+                a.download = 'matrix.webm';
                 a.click();
-                URL.revokeObjectURL(url);
-                
-                isRecordingVideo = false;
-                videoMessage.style.display = 'none';
-                controlsContainer.style.pointerEvents = 'auto';
-                recordVideoButton.disabled = false;
-                recordVideo2KButton.disabled = false;
-                
-                if (typeof OffscreenCanvas === 'undefined') {
-                    recordingOffscreenCanvas.remove();
-                }
+                window.URL.revokeObjectURL(url);
+                showMessage("Gravação finalizada e vídeo pronto para download!", 'success');
             };
 
             mediaRecorder.start();
-            recordingStartTime = performance.now();
-            
-            setTimeout(() => {
-                if (mediaRecorder.state === 'recording') {
-                    mediaRecorder.stop();
-                }
-            }, videoDuration);
-            
-        } catch (e) {
-            console.error("Erro ao iniciar a gravação de vídeo:", e);
-            isRecordingVideo = false;
-            videoMessage.style.display = 'none';
-            controlsContainer.style.pointerEvents = 'auto';
-            recordVideoButton.disabled = false;
-            recordVideo2KButton.disabled = false;
-            alert("Desculpe, a gravação de vídeo não é suportada neste navegador ou dispositivo.");
+            isRecording = true;
+            document.getElementById('record-button').disabled = true;
+            document.getElementById('stop-record-button').disabled = false;
+            showMessage("Gravação iniciada.", 'success');
+        } catch (error) {
+            console.error('Erro ao iniciar a gravação:', error);
+            showMessage("Não foi possível iniciar a gravação. Verifique as permissões do navegador.", 'error');
         }
     }
 
+    // Para a gravação do vídeo
+    function stopRecording() {
+        if (!isRecording) {
+            showMessage("A gravação não está em andamento.", 'info');
+            return;
+        }
+
+        mediaRecorder.stop();
+        isRecording = false;
+        document.getElementById('record-button').disabled = false;
+        document.getElementById('stop-record-button').disabled = true;
+    }
 
     function init() {
         loadSettings();
@@ -769,7 +803,7 @@
         window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            columns = width / fontSize;
+            columns = Math.floor(width / fontSize);
             drops.length = 0;
             for (let i = 0; i < columns; i++) {
                 drops[i] = 1;
@@ -781,12 +815,9 @@
         const startButton = document.getElementById('start-button');
         const pauseButton = document.getElementById('pause-button');
         const resetButton = document.getElementById('reset-button');
-        const audioButton = document.getElementById('audio-button');
+        const recordButton = document.getElementById('record-button');
+        const stopRecordButton = document.getElementById('stop-record-button');
         const menuToggleButton = document.getElementById('menu-toggle-button');
-        const downloadPngButton = document.getElementById('download-png-button');
-        const recordVideoButton = document.getElementById('record-video-button');
-        const recordVideo2KButton = document.getElementById('record-video-2k-button');
-        const pngMessage = document.getElementById('png-message');
         
         colorChoice.addEventListener('input', (e) => {
             textColor = e.target.value;
@@ -802,7 +833,7 @@
         });
         fontSizeInput.addEventListener('input', (e) => {
             fontSize = parseInt(e.target.value, 10);
-            columns = width / fontSize;
+            columns = Math.floor(width / fontSize);
             drops.length = 0;
             for (let i = 0; i < columns; i++) {
                 drops[i] = 1;
@@ -836,17 +867,11 @@
         pauseButton.addEventListener('click', () => {
             isPaused = !isPaused;
             if (isPaused) {
-                pauseButton.innerText = 'Retomar';
+                pauseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M14.25 7.5L18 12l-3.75 4.5M20 12a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span class="text-base">Retomar</span><span class="glitch-text">Retomar</span>`;
                 cancelAnimationFrame(animationFrameId);
-                if (isAudioOn) {
-                    synth.triggerRelease('+0.1');
-                }
             } else {
-                pauseButton.innerText = 'Pausar';
+                pauseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.75 3a.75.75 0 00-.75-.75H9a.75.75 0 00-.75.75v1.5a.75.75 0 001.5 0V4.5a.75.75 0 01.75-.75h4.5a.75.75 0 01.75.75v1.5a.75.75 0 001.5 0V3zM12 21a9 9 0 100-18 9 9 0 000 18zm-.75-7.5a.75.75 0 011.5 0v3.75a.75.75 0 01-1.5 0v-3.75z"/></svg><span class="text-base">Pausar</span><span class="glitch-text">Pausar</span>`;
                 draw();
-                if (isAudioOn) {
-                    synth.triggerAttackRelease("C4", "16n", Tone.now());
-                }
             }
         });
 
@@ -857,9 +882,6 @@
             controlsContainer.style.display = 'none';
             document.getElementById('horario').style.display = 'none';
             document.getElementById('visitor-counter').style.display = 'none';
-            if (isAudioOn) {
-                synth.triggerRelease('+0.1');
-            }
             ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, width, height);
@@ -867,49 +889,21 @@
                 drops[i] = 1;
             }
             typedChars = [];
+            pauseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M14.25 7.5L18 12l-3.75 4.5M20 12a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span class="text-base">Pausar</span><span class="glitch-text">Pausar</span>`;
         });
 
-        audioButton.addEventListener('click', () => {
-            if (isAudioOn) {
-                synth.triggerRelease('+0.1');
-                audioButton.innerText = 'Ligar Áudio';
-            } else {
-                synth.triggerAttackRelease("C4", "16n", Tone.now());
-                audioButton.innerText = 'Desligar Áudio';
-            }
-            isAudioOn = !isAudioOn;
-        });
+        recordButton.addEventListener('click', startRecording);
+        stopRecordButton.addEventListener('click', stopRecording);
 
         menuToggleButton.addEventListener('click', () => {
             if (document.getElementById('main-content-container').style.display === 'none') {
                 document.getElementById('main-content-container').style.display = 'flex';
-                menuToggleButton.innerText = 'Esconder Menu';
+                menuToggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/></svg><span class="text-base">Esconder Menu</span><span class="glitch-text">Menu</span>`;
             } else {
                 document.getElementById('main-content-container').style.display = 'none';
-                menuToggleButton.innerText = 'Mostrar Menu';
+                menuToggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/></svg><span class="text-base">Mostrar Menu</span><span class="glitch-text">Menu</span>`;
             }
         });
-
-        downloadPngButton.addEventListener('click', () => {
-            const downloadCanvas = document.createElement('canvas');
-            downloadCanvas.width = width;
-            downloadCanvas.height = height;
-            const downloadCtx = downloadCanvas.getContext('2d');
-            
-            // Desenha a imagem completa, incluindo a mensagem secreta se estiver visível
-            drawFrame(downloadCtx, width, height, drops, 1, true);
-            
-            const link = document.createElement('a');
-            link.download = 'preview-matrix.png';
-            link.href = downloadCanvas.toDataURL('image/png');
-            link.click();
-            
-            pngMessage.style.display = 'block';
-            setTimeout(() => { pngMessage.style.display = 'none'; }, 3000);
-        });
-
-        recordVideoButton.addEventListener('click', () => startVideoRecording('1080p'));
-        recordVideo2KButton.addEventListener('click', () => startVideoRecording('2k'));
     }
 
     window.addEventListener('DOMContentLoaded', () => {
