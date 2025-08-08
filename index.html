@@ -361,7 +361,7 @@
         <!-- Anúncio da direita para desktop -->
         <div id="ad-right-desktop" class="ad-container">
             <a href="#" class="ad-link">
-                <img src="https://placehold.co/250x400/003300/ffffff?text=An%C3%BAncio+2" alt="Anúncio 2">
+                <img src="https://placehold.co/250x400/003300/ffffff?text=An%C3%BAncio+1" alt="Anúncio 1">
             </a>
         </div>
         
@@ -387,7 +387,8 @@
         <button id="audio-button">Ligar Áudio</button>
         <button id="menu-toggle-button">Esconder Menu</button>
         <button id="download-png-button">Baixar PNG</button>
-        <button id="record-video-button">Gravar Vídeo (2K)</button>
+        <button id="record-video-button">Gravar Vídeo (1080p)</button>
+        <button id="record-video-2k-button">Gravar Vídeo (2K)</button>
     </div>
 
     <div id="visitor-counter">
@@ -458,6 +459,7 @@
     const videoDuration = 15000;
     let isRecordingVideo = false;
     let recordingStartTime = 0;
+    let recordingOffscreenCanvas;
     
     // Variável de estado para a mensagem secreta
     let isSecretMessageVisible = false;
@@ -651,7 +653,7 @@
         horarioElemento.textContent = `${horas}:${minutos}:${segundos}`;
     }
     
-    function startVideoRecording() {
+    function startVideoRecording(resolution) {
         if (isRecordingVideo) return;
 
         isRecordingVideo = true;
@@ -661,66 +663,103 @@
         
         const controlsContainer = document.getElementById('controls-container');
         const recordVideoButton = document.getElementById('record-video-button');
+        const recordVideo2KButton = document.getElementById('record-video-2k-button');
         controlsContainer.style.pointerEvents = 'none';
         recordVideoButton.disabled = true;
+        recordVideo2KButton.disabled = true;
         
-        const videoWidth = 2560;
-        const videoHeight = 1440;
+        let videoWidth, videoHeight;
+        if (resolution === '2k') {
+            videoWidth = 2560;
+            videoHeight = 1440;
+        } else {
+            videoWidth = 1920;
+            videoHeight = 1080;
+        }
+
         const videoBitrate = 15000000;
         
-        const offscreenCanvas = new OffscreenCanvas(videoWidth, videoHeight);
-        const offscreenCtx = offscreenCanvas.getContext('2d');
-        
-        let recordingAnimationFrameId;
-
-        // Loop de gravação em alta resolução
-        const recordingLoop = () => {
-            if (!isRecordingVideo) {
-                return;
+        try {
+            if (typeof OffscreenCanvas !== 'undefined') {
+                recordingOffscreenCanvas = new OffscreenCanvas(videoWidth, videoHeight);
+            } else {
+                // Fallback para navegadores sem OffscreenCanvas
+                recordingOffscreenCanvas = document.createElement('canvas');
+                recordingOffscreenCanvas.width = videoWidth;
+                recordingOffscreenCanvas.height = videoHeight;
             }
-            // Desenha um frame no offscreen canvas
-            const fontScale = videoWidth / width;
-            drawFrame(offscreenCtx, videoWidth, videoHeight, drops, fontScale, true);
-            recordingAnimationFrameId = requestAnimationFrame(recordingLoop);
-        };
-        
-        // Inicia o loop de gravação
-        recordingAnimationFrameId = requestAnimationFrame(recordingLoop);
-        
-        const videoStream = offscreenCanvas.captureStream();
-        mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm', videoBitsPerSecond: videoBitrate });
-        
-        videoChunks = [];
-        mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-                videoChunks.push(event.data);
-            }
-        };
-
-        mediaRecorder.onstop = () => {
-            cancelAnimationFrame(recordingAnimationFrameId);
-            const blob = new Blob(videoChunks, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'matrix-video-2k.webm';
-            a.click();
-            URL.revokeObjectURL(url);
+            const offscreenCtx = recordingOffscreenCanvas.getContext('2d');
             
+            let recordingAnimationFrameId;
+
+            // Loop de gravação em alta resolução
+            const recordingLoop = () => {
+                if (!isRecordingVideo) {
+                    return;
+                }
+                // Desenha um frame no offscreen canvas
+                const fontScale = videoWidth / width;
+                drawFrame(offscreenCtx, videoWidth, videoHeight, drops, fontScale, true);
+                
+                // Grava o frame no stream
+                if (mediaRecorder.state === 'recording') {
+                    // This is a simple way to push frames, may need optimization
+                }
+                
+                recordingAnimationFrameId = requestAnimationFrame(recordingLoop);
+            };
+            
+            recordingAnimationFrameId = requestAnimationFrame(recordingLoop);
+
+            const videoStream = recordingOffscreenCanvas.captureStream();
+            mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm', videoBitsPerSecond: videoBitrate });
+            
+            videoChunks = [];
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    videoChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                cancelAnimationFrame(recordingAnimationFrameId);
+                const blob = new Blob(videoChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `matrix-video-${resolution}.webm`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                isRecordingVideo = false;
+                videoMessage.style.display = 'none';
+                controlsContainer.style.pointerEvents = 'auto';
+                recordVideoButton.disabled = false;
+                recordVideo2KButton.disabled = false;
+                
+                if (typeof OffscreenCanvas === 'undefined') {
+                    recordingOffscreenCanvas.remove();
+                }
+            };
+
+            mediaRecorder.start();
+            recordingStartTime = performance.now();
+            
+            setTimeout(() => {
+                if (mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                }
+            }, videoDuration);
+            
+        } catch (e) {
+            console.error("Erro ao iniciar a gravação de vídeo:", e);
             isRecordingVideo = false;
             videoMessage.style.display = 'none';
             controlsContainer.style.pointerEvents = 'auto';
             recordVideoButton.disabled = false;
-        };
-
-        mediaRecorder.start();
-        recordingStartTime = performance.now();
-        
-        setTimeout(() => {
-            if (mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-            }
-        }, videoDuration);
+            recordVideo2KButton.disabled = false;
+            alert("Desculpe, a gravação de vídeo não é suportada neste navegador ou dispositivo.");
+        }
     }
 
 
@@ -746,6 +785,7 @@
         const menuToggleButton = document.getElementById('menu-toggle-button');
         const downloadPngButton = document.getElementById('download-png-button');
         const recordVideoButton = document.getElementById('record-video-button');
+        const recordVideo2KButton = document.getElementById('record-video-2k-button');
         const pngMessage = document.getElementById('png-message');
         
         colorChoice.addEventListener('input', (e) => {
@@ -868,7 +908,8 @@
             setTimeout(() => { pngMessage.style.display = 'none'; }, 3000);
         });
 
-        recordVideoButton.addEventListener('click', startVideoRecording);
+        recordVideoButton.addEventListener('click', () => startVideoRecording('1080p'));
+        recordVideo2KButton.addEventListener('click', () => startVideoRecording('2k'));
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -881,7 +922,6 @@
 </script>
 </body>
 </html>
-
 
 --- a/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
 +++ b/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
