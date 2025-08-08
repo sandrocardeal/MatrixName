@@ -7,11 +7,71 @@
     <!-- Incluindo Tailwind CSS para estilização rápida -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Importa a fonte Inter do Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        /* Importa as fontes do Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=VT323&family=Press+Start+2P&display=swap');
+        :root {
+            /* Cores do tema padrão (Matrix) */
+            --primary-color: #00ff00;
+            --secondary-color: #00cc00;
+            --primary-glow: rgba(0, 255, 0, 0.5);
+            --primary-glow-strong: rgba(0, 255, 0, 0.8);
+            --background-color: #000000;
+            --text-color: #ffffff;
+            --panel-bg: rgba(0, 0, 0, 0.7);
+            --panel-border: #00ff00;
+            --panel-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            --panel-shadow-inset: 0 0 30px rgba(0, 255, 0, 0.5) inset;
+            --success-color: #22c55e;
+            --info-color: #3b82f6;
+            --error-color: #ef4444;
+            --font-matrix: 'VT323', monospace;
+            --font-ui: 'Inter', sans-serif;
+            --font-title: 'Press Start 2P', cursive;
+        }
+        
+        /* Tema Azul (Tron) */
+        .theme-blue {
+            --primary-color: #0088ff;
+            --primary-glow: rgba(0, 136, 255, 0.5);
+            --primary-glow-strong: rgba(0, 136, 255, 0.8);
+            --panel-border: #0088ff;
+            --panel-shadow: 0 0 20px rgba(0, 136, 255, 0.5);
+            --panel-shadow-inset: 0 0 30px rgba(0, 136, 255, 0.5) inset;
+        }
+        
+        /* Tema Vermelho (Cyberpunk) */
+        .theme-red {
+            --primary-color: #ff0055;
+            --primary-glow: rgba(255, 0, 85, 0.5);
+            --primary-glow-strong: rgba(255, 0, 85, 0.8);
+            --panel-border: #ff0055;
+            --panel-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+            --panel-shadow-inset: 0 0 30px rgba(255, 0, 85, 0.5) inset;
+        }
+        
+        /* Tema Roxo (Synthwave) */
+        .theme-purple {
+            --primary-color: #b300ff;
+            --primary-glow: rgba(179, 0, 255, 0.5);
+            --primary-glow-strong: rgba(179, 0, 255, 0.8);
+            --panel-border: #b300ff;
+            --panel-shadow: 0 0 20px rgba(179, 0, 255, 0.5);
+            --panel-shadow-inset: 0 0 30px rgba(179, 0, 255, 0.5) inset;
+        }
+        
+        /* Tema Dourado (Retro) */
+        .theme-gold {
+            --primary-color: #ffbb00;
+            --primary-glow: rgba(255, 187, 0, 0.5);
+            --primary-glow-strong: rgba(255, 187, 0, 0.8);
+            --panel-border: #ffbb00;
+            --panel-shadow: 0 0 20px rgba(255, 187, 0, 0.5);
+            --panel-shadow-inset: 0 0 30px rgba(255, 187, 0, 0.5) inset;
+        }
+        
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000;
+            font-family: var(--font-ui);
+            background-color: var(--background-color);
             margin: 0;
             overflow: hidden;
             padding: 1rem; /* Adiciona padding para evitar que o conteúdo grude nas bordas */
@@ -39,46 +99,90 @@
         }
         #menu-container {
             padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #0f0;
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
             border-radius: 1rem;
-            color: #0f0;
+            color: var(--primary-color);
             /* Alterado para um comportamento mais responsivo */
             width: 100%; /* Ocupa 100% da largura do contêiner pai */
             max-width: 400px; /* Limite de 400px para desktop */
-            box-shadow: 0 0 20px #0f0, 0 0 30px #0f0 inset;
-            animation: pulse-green 2s infinite;
+            box-shadow: var(--panel-shadow), var(--panel-shadow-inset);
+            animation: pulse-glow 2s infinite;
             transition: all 0.5s ease-in-out;
             display: block;
+            backdrop-filter: blur(5px);
         }
         /* Animação de pulsação para o menu */
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 20px #0f0, 0 0 30px #0f0 inset; }
-            50% { box-shadow: 0 0 30px #0f0, 0 0 40px #0f0 inset; }
-            100% { box-shadow: 0 0 20px #0f0, 0 0 30px #0f0 inset; }
+        @keyframes pulse-glow {
+            0% { box-shadow: var(--panel-shadow), var(--panel-shadow-inset); }
+            50% { box-shadow: 0 0 30px var(--primary-glow-strong), 0 0 40px var(--primary-glow-strong) inset; }
+            100% { box-shadow: var(--panel-shadow), var(--panel-shadow-inset); }
+        }
+        
+        /* Animação de flutuação */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Animação de glitch */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0); }
+        }
+        
+        /* Animação de brilho de texto */
+        @keyframes text-shadow-glow {
+            0% { text-shadow: 0 0 5px var(--primary-glow); }
+            50% { text-shadow: 0 0 15px var(--primary-glow-strong), 0 0 30px var(--primary-glow); }
+            100% { text-shadow: 0 0 5px var(--primary-glow); }
         }
         .matrix-title {
             text-align: center;
             font-size: 1.25rem;
             font-weight: bold;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 5px #0f0;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 5px var(--primary-color);
+            font-family: var(--font-title);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            animation: text-shadow-glow 2s infinite;
+            transition: all 0.3s ease;
+        }
+        
+        .matrix-title:hover {
+            transform: scale(1.05);
         }
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
             font-size: 0.875rem;
             font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 0 3px var(--primary-glow);
         }
         .form-select, .form-input, .form-color, .form-range {
             width: 100%;
             padding: 0.5rem;
             margin-bottom: 0.75rem;
             background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #0f0;
+            border: 1px solid var(--primary-color);
             border-radius: 0.5rem;
-            color: #0f0;
+            color: var(--primary-color);
             font-size: 0.875rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px var(--primary-glow);
+        }
+        
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: var(--text-color);
+            box-shadow: 0 0 10px var(--primary-glow-strong);
         }
         .form-color {
             height: 40px;
@@ -90,20 +194,49 @@
         .form-button {
             width: 100%;
             padding: 0.75rem;
-            background: #0f0;
-            color: #000;
+            background: var(--primary-color);
+            color: var(--background-color);
             border: none;
             border-radius: 0.5rem;
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px #0f0;
+            box-shadow: 0 0 10px var(--primary-glow);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: var(--font-title);
         }
+        
+        .form-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, var(--primary-glow), transparent);
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
         .form-button:hover {
-            background: #fff;
-            color: #000;
-            box-shadow: 0 0 20px #0f0;
+            background: var(--text-color);
+            color: var(--background-color);
+            box-shadow: 0 0 20px var(--primary-glow-strong);
+        }
+        
+        .form-button:hover::before {
+            opacity: 1;
+            animation: glint 1.5s infinite;
+        }
+        
+        @keyframes glint {
+            0% { transform: translate(-50%, -50%) rotate(45deg); }
+            100% { transform: translate(50%, 50%) rotate(45deg); }
         }
         #secret-message {
             display: none;
@@ -121,15 +254,19 @@
             width: 90%;
             max-width: 600px;
             flex-wrap: wrap;
+            backdrop-filter: blur(5px);
+            padding: 0.75rem;
+            border-radius: 1rem;
+            background: rgba(0, 0, 0, 0.3);
         }
         #controls-container button {
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             font-weight: bold;
-            background: rgba(15, 255, 0, 0.5);
-            color: #fff;
-            border: 2px solid #0f0;
-            transition: all 0.2s ease;
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            transition: all 0.3s ease;
             cursor: pointer;
             flex-grow: 1;
             min-width: 0;
@@ -140,19 +277,52 @@
             gap: 0.5rem;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 0 5px var(--primary-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+        
+        #controls-container button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--primary-glow), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
         #controls-container button:hover:not(:disabled) {
-            background: rgba(15, 255, 0, 0.8);
-            box-shadow: 0 0 10px #0f0;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 15px var(--primary-glow-strong);
+            transform: translateY(-2px);
         }
+        
+        #controls-container button:hover:not(:disabled)::after {
+            opacity: 0.2;
+            animation: button-glow 1.5s infinite;
+        }
+        
+        @keyframes button-glow {
+            0% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 0.1; }
+        }
+        
         #controls-container button:disabled {
-            background: rgba(15, 255, 0, 0.2);
-            border-color: #053b05;
+            background: rgba(0, 0, 0, 0.4);
+            border-color: rgba(var(--primary-color), 0.3);
+            color: rgba(var(--primary-color), 0.5);
             cursor: not-allowed;
+            box-shadow: none;
         }
+        
         #controls-container button svg {
             width: 1.25rem;
             height: 1.25rem;
+            filter: drop-shadow(0 0 2px var(--primary-glow));
         }
         .glitch-text {
             position: absolute;
@@ -214,27 +384,46 @@
         #visitor-counter {
             position: absolute;
             z-index: 10;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #0f0;
-            color: #0f0;
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            color: var(--primary-color);
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             top: 1rem;
             right: 1rem;
             font-size: 1rem;
+            box-shadow: 0 0 10px var(--primary-glow);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            font-family: var(--font-matrix);
         }
+        
+        #visitor-counter:hover {
+            box-shadow: 0 0 15px var(--primary-glow-strong);
+            transform: translateY(-2px);
+        }
+        
         #horario {
             position: absolute;
             z-index: 10;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #0f0;
-            color: #0f0;
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            color: var(--primary-color);
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             top: 1rem;
             left: 1rem;
             font-size: 1rem;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: var(--font-matrix);
+            box-shadow: 0 0 10px var(--primary-glow);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+        }
+        
+        #horario:hover {
+            box-shadow: 0 0 15px var(--primary-glow-strong);
+            transform: translateY(-2px);
         }
         .message-box {
             position: fixed;
@@ -243,24 +432,50 @@
             transform: translate(-50%, -50%);
             font-size: 1.5rem;
             font-weight: bold;
-            color: #fff;
+            color: var(--text-color);
             background: rgba(0, 0, 0, 0.8);
-            padding: 1rem;
-            border-radius: 0.5rem;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
             text-align: center;
             display: none;
             z-index: 20;
             width: 300px;
-            border: 2px solid #0f0;
+            border: 2px solid var(--primary-color);
             max-width: 90vw;
             box-sizing: border-box;
+            box-shadow: 0 0 20px var(--primary-glow);
+            backdrop-filter: blur(10px);
+            font-family: var(--font-matrix);
+            letter-spacing: 1px;
+            animation: message-appear 0.3s ease-out;
         }
+        
+        @keyframes message-appear {
+            0% { opacity: 0; transform: translate(-50%, -60%); }
+            100% { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
         .message-box.active {
             display: block;
         }
-        .message-box.info { border-color: #3b82f6; color: #3b82f6; }
-        .message-box.error { border-color: #ef4444; color: #ef4444; }
-        .message-box.success { border-color: #22c55e; color: #22c55e; }
+        
+        .message-box.info { 
+            border-color: var(--info-color); 
+            color: var(--info-color); 
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        
+        .message-box.error { 
+            border-color: var(--error-color); 
+            color: var(--error-color); 
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+        
+        .message-box.success { 
+            border-color: var(--success-color); 
+            color: var(--success-color); 
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        }
         
         /* Media queries para responsividade */
         @media (min-width: 1024px) {
@@ -400,6 +615,27 @@
                 <label for="font_size" class="form-label">Tamanho da Fonte:</label>
                 <input type="range" id="font_size" class="form-range" min="10" max="30" value="15">
             </div>
+            
+            <div class="mb-4">
+                <label for="theme_choice" class="form-label">Tema Visual:</label>
+                <select id="theme_choice" class="form-select">
+                    <option value="default" selected>Matrix (Verde)</option>
+                    <option value="blue">Tron (Azul)</option>
+                    <option value="red">Cyberpunk (Vermelho)</option>
+                    <option value="purple">Synthwave (Roxo)</option>
+                    <option value="gold">Retro (Dourado)</option>
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label for="effect_choice" class="form-label">Efeito Visual:</label>
+                <select id="effect_choice" class="form-select">
+                    <option value="1" selected>Padrão</option>
+                    <option value="2">Profundidade 3D</option>
+                    <option value="3">Partículas</option>
+                    <option value="4">Glitch</option>
+                </select>
+            </div>
 
             <div class="mb-6">
                 <label for="user_name" class="form-label">Digite seu nome:</label>
@@ -503,6 +739,10 @@
     let fontSize = 15;
     let userName = '';
     let names = ['Neo', 'Morpheus', 'Trinity', 'Agente Smith', 'Oraculo'];
+    let currentTheme = 'default';
+    let visualEffect = 1;
+    let particles = [];
+    let glitchIntensity = 0;
     
     // Declarações globais dos elementos do formulário
     const colorChoice = document.getElementById('color_choice');
@@ -510,6 +750,39 @@
     const charChoice = document.getElementById('char_choice');
     const fontSizeInput = document.getElementById('font_size');
     const userNameInput = document.getElementById('user_name');
+    const themeChoice = document.getElementById('theme_choice');
+    const effectChoice = document.getElementById('effect_choice');
+    
+    // Função para aplicar o tema selecionado
+    function applyTheme(theme) {
+        document.body.className = '';
+        if (theme !== 'default') {
+            document.body.classList.add('theme-' + theme);
+        }
+        
+        // Atualiza a cor do texto com base no tema
+        switch(theme) {
+            case 'blue':
+                textColor = '#0088ff';
+                colorChoice.value = '#0088ff';
+                break;
+            case 'red':
+                textColor = '#ff0055';
+                colorChoice.value = '#ff0055';
+                break;
+            case 'purple':
+                textColor = '#b300ff';
+                colorChoice.value = '#b300ff';
+                break;
+            case 'gold':
+                textColor = '#ffbb00';
+                colorChoice.value = '#ffbb00';
+                break;
+            default:
+                textColor = '#00ff00';
+                colorChoice.value = '#00ff00';
+        }
+    }
     
     // Mapeamento de caracteres para binário
     const binary_db = {
@@ -708,11 +981,119 @@
         }
     }
 
+    // Função para criar partículas para o efeito 3
+    function createParticles() {
+        if (particles.length < 50) {
+            const particle = {
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 3 + 1,
+                speedX: (Math.random() - 0.5) * 2,
+                speedY: (Math.random() - 0.5) * 2,
+                color: textColor
+            };
+            particles.push(particle);
+        }
+    }
+    
+    // Função para atualizar e desenhar partículas
+    function updateParticles() {
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            p.x += p.speedX;
+            p.y += p.speedY;
+            
+            // Verifica se a partícula saiu da tela
+            if (p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
+                // Reposiciona a partícula
+                p.x = Math.random() * width;
+                p.y = Math.random() * height;
+            }
+            
+            // Desenha a partícula
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+        }
+    }
+    
+    // Função para aplicar efeito glitch
+    function applyGlitchEffect() {
+        if (Math.random() < 0.05) {
+            glitchIntensity = Math.random() * 10;
+            setTimeout(() => { glitchIntensity = 0; }, 100);
+        }
+        
+        if (glitchIntensity > 0) {
+            // Efeito de deslocamento horizontal
+            const sliceHeight = 10;
+            const numSlices = Math.floor(height / sliceHeight);
+            
+            for (let i = 0; i < numSlices; i++) {
+                if (Math.random() < 0.1) {
+                    const y = i * sliceHeight;
+                    const displacement = (Math.random() - 0.5) * glitchIntensity * 20;
+                    
+                    // Copia e desloca uma fatia da imagem
+                    const imageData = ctx.getImageData(0, y, width, sliceHeight);
+                    ctx.putImageData(imageData, displacement, y);
+                }
+            }
+            
+            // Efeito de cor RGB split
+            if (Math.random() < 0.2) {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, width, height);
+            }
+        }
+    }
+    
+    // Função para aplicar efeito 3D
+    function apply3DEffect() {
+        // Cria uma cópia do canvas com sombra
+        const shadowCanvas = document.createElement('canvas');
+        shadowCanvas.width = width;
+        shadowCanvas.height = height;
+        const shadowCtx = shadowCanvas.getContext('2d');
+        
+        // Copia o conteúdo atual com um pequeno deslocamento
+        shadowCtx.drawImage(canvas, 2, 2);
+        shadowCtx.globalCompositeOperation = 'source-in';
+        shadowCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        shadowCtx.fillRect(0, 0, width, height);
+        
+        // Desenha a sombra no canvas principal
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.drawImage(shadowCanvas, 0, 0);
+        ctx.globalCompositeOperation = 'source-over';
+    }
+    
     // Loop principal da animação
     function draw() {
         if (isPaused) return;
         updateDrops();
+        
+        // Limpa o canvas com um efeito de rastro
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Desenha o frame básico
         drawFrame(ctx, width, height, drops, 1, true);
+        
+        // Aplica efeitos visuais com base na seleção
+        switch (visualEffect) {
+            case 2: // Efeito 3D
+                apply3DEffect();
+                break;
+            case 3: // Efeito de partículas
+                createParticles();
+                updateParticles();
+                break;
+            case 4: // Efeito glitch
+                applyGlitchEffect();
+                break;
+        }
 
         secretMessageCounter++;
         if (secretMessageCounter >= secretMessageTrigger) {
@@ -733,7 +1114,9 @@
             pauseTime: speedChoice.value,
             charSetSize: charChoice.value,
             fontSize: fontSizeInput.value,
-            userName: userNameInput.value
+            userName: userNameInput.value,
+            theme: currentTheme,
+            effect: visualEffect
         };
         localStorage.setItem('matrixSettings', JSON.stringify(settings));
     }
@@ -752,6 +1135,18 @@
             fontSize = parseInt(settings.fontSize, 10);
             userNameInput.value = settings.userName;
             userName = settings.userName;
+            
+            // Carrega as novas configurações
+            if (settings.theme) {
+                currentTheme = settings.theme;
+                themeChoice.value = settings.theme;
+                applyTheme(currentTheme);
+            }
+            
+            if (settings.effect) {
+                visualEffect = parseInt(settings.effect, 10);
+                effectChoice.value = settings.effect;
+            }
             
             columns = Math.floor(width / fontSize);
             drops.length = 0;
@@ -906,6 +1301,18 @@
         userNameInput.addEventListener('input', () => {
             saveSettings();
         });
+        
+        // Event listeners para os novos controles
+        themeChoice.addEventListener('change', (e) => {
+            currentTheme = e.target.value;
+            applyTheme(currentTheme);
+            saveSettings();
+        });
+        
+        effectChoice.addEventListener('change', (e) => {
+            visualEffect = parseInt(e.target.value, 10);
+            saveSettings();
+        });
 
         window.addEventListener('keydown', (e) => {
             if (controlsContainer.style.display === 'flex' && !isPaused) {
@@ -977,8 +1384,6 @@
         init();
     });
 </script>
-</body>
-</html>
 
 <p class="text-xs">Dicas e Reclamaçoes : Sandro21_cardeal@hotmail.COM</p
 --- a/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
