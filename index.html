@@ -353,6 +353,66 @@
         .ad-container {
             display: none;
             width: 250px;
+            position: relative;
+        }
+        
+        /* Badge promocional para os anúncios */
+        .ad-container::before {
+            content: 'Aposte com responsabilidade';
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: var(--background-color);
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            z-index: 20;
+            box-shadow: 0 0 10px var(--primary-glow);
+            font-family: var(--font-title);
+            letter-spacing: 1px;
+            animation: pulse-badge 2s infinite;
+        }
+        
+        /* Contador de tempo para os anúncios */
+        .ad-container::after {
+            content: attr(data-countdown);
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--primary-color);
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            z-index: 20;
+            box-shadow: 0 0 5px var(--primary-glow);
+            font-family: var(--font-matrix);
+            letter-spacing: 1px;
+        }
+        
+        @keyframes pulse-badge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Efeito de destaque quando o contador reinicia */
+        @keyframes countdown-flash {
+            0% { box-shadow: 0 0 10px var(--primary-glow); }
+            50% { box-shadow: 0 0 30px var(--primary-glow-strong); }
+            100% { box-shadow: 0 0 10px var(--primary-glow); }
+        }
+        
+        .countdown-reset .ad-link {
+            animation: countdown-flash 0.5s ease-in-out 4;
+        }
+        
+        .countdown-reset::before {
+            content: 'OFERTA RENOVADA!';
+            animation: pulse-badge 0.5s infinite;
         }
         .ad-link {
             display: flex;
@@ -365,21 +425,81 @@
             background: rgba(0, 0, 0, 0.8);
             border-radius: 0.5rem;
             overflow: hidden;
-            border: 2px solid #0f0;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            border: 2px solid var(--panel-border);
+            box-shadow: 0 0 10px var(--primary-glow);
             transition: all 0.3s ease;
             text-align: center;
             text-decoration: none;
+            position: relative;
+            animation: pulse-glow 3s infinite;
+        }
+        .ad-link::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--primary-color), transparent, var(--primary-color));
+            z-index: -1;
+            border-radius: 0.6rem;
+            animation: rotate-border 3s linear infinite;
+            opacity: 0.6;
+        }
+        @keyframes rotate-border {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .ad-link:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px #0f0;
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 0 25px var(--primary-glow-strong);
+            animation: glitch 0.3s infinite;
         }
         .ad-link img {
             width: 100%;
             height: auto;
             border-radius: 0.5rem;
             object-fit: cover;
+            transition: all 0.5s ease;
+            filter: brightness(0.9) contrast(1.1);
+            max-height: 120px;
+        }
+        .ad-link:hover img {
+            filter: brightness(1.1) contrast(1.2) saturate(1.2);
+        }
+        .ad-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            opacity: 0;
+        }
+        .ad-link:hover .ad-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .ad-title {
+            font-family: var(--font-title);
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+            text-shadow: 0 0 5px var(--primary-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .ad-description {
+            font-family: var(--font-matrix);
+            font-size: 0.75rem;
+            color: var(--text-color);
+            margin: 0;
         }
         #visitor-counter {
             position: absolute;
@@ -567,20 +687,28 @@
     <!-- Container principal que envolve o menu e os anúncios -->
     <div id="main-content-container">
         <!-- ANÚNCIO SUPERIOR PARA MOBILE -->
-        <div id="ad-top-mobile" class="ad-container">
+        <div id="ad-top-mobile" class="ad-container" data-countdown="23:59:59">
             <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
             <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
                 <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
                 <img src="imagens/minha_foto1.jpg" alt="Sua foto de anúncio">
+                <div class="ad-content">
+                    <h3 class="ad-title">OOBET3</h3>
+                    <p class="ad-description">Jogos online e apostas esportivas!</p>
+                </div>
             </a>
         </div>
 
         <!-- ANÚNCIO DA ESQUERDA PARA DESKTOP -->
-        <div id="ad-left-desktop" class="ad-container">
+        <div id="ad-left-desktop" class="ad-container" data-countdown="23:59:59">
             <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
             <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
                 <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
                 <img src="imagens/minha_foto1.jpg" alt="Sua foto de anúncio">
+                <div class="ad-content">
+                    <h3 class="ad-title">OOBET3</h3>
+                    <p class="ad-description">Jogos online e apostas esportivas!</p>
+                </div>
             </a>
         </div>
 
@@ -653,20 +781,28 @@
         </div>
 
         <!-- ANÚNCIO DA DIREITA PARA DESKTOP -->
-        <div id="ad-right-desktop" class="ad-container">
+        <div id="ad-right-desktop" class="ad-container" data-countdown="23:59:59">
             <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
             <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
                 <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
                 <img src="imagens/minha_foto.jpg" alt="Sua foto de anúncio">
+                <div class="ad-content">
+                    <h3 class="ad-title">OOBET3</h3>
+                    <p class="ad-description">Jogos online e apostas esportivas!</p>
+                </div>
             </a>
         </div>
         
         <!-- ANÚNCIO INFERIOR PARA MOBILE -->
-        <div id="ad-bottom-mobile" class="ad-container">
+        <div id="ad-bottom-mobile" class="ad-container" data-countdown="23:59:59">
             <!-- LINHA PARA O SEU ANÚNCIO. MANTENHA A ESTRUTURA! -->
             <a href="http://www.oobet3.com/?r=yql2000" class="ad-link" target="_blank">
                 <!-- A IMAGEM VAI AQUI. O 'src' JÁ FOI ATUALIZADO COM A SUA FOTO -->
                 <img src="imagens/minha_foto.jpg" alt="Sua foto de anúncio">
+                <div class="ad-content">
+                    <h3 class="ad-title">OOBET3</h3>
+                    <p class="ad-description">Jogos online e apostas esportivas!</p>
+                </div>
             </a>
         </div>
     </div>
@@ -1376,15 +1512,60 @@
         });
     }
 
+    // Função para atualizar o contador de tempo dos anúncios
+    function updateAdCountdowns() {
+        const adContainers = document.querySelectorAll('.ad-container[data-countdown]');
+        
+        adContainers.forEach(container => {
+            let countdownValue = container.getAttribute('data-countdown');
+            if (!countdownValue.includes(':')) {
+                // Se for a primeira vez, inicializa com um tempo aleatório entre 1 e 24 horas
+                const hours = Math.floor(Math.random() * 23) + 1;
+                const minutes = Math.floor(Math.random() * 59);
+                const seconds = Math.floor(Math.random() * 59);
+                countdownValue = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                container.setAttribute('data-countdown', countdownValue);
+            } else {
+                // Atualiza o contador
+                const [hours, minutes, seconds] = countdownValue.split(':').map(Number);
+                let totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    const newHours = Math.floor(totalSeconds / 3600);
+                    const newMinutes = Math.floor((totalSeconds % 3600) / 60);
+                    const newSeconds = totalSeconds % 60;
+                    
+                    const newCountdown = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}:${newSeconds.toString().padStart(2, '0')}`;
+                    container.setAttribute('data-countdown', newCountdown);
+                } else {
+                    // Quando o contador chegar a zero, reinicia com um novo tempo aleatório
+                    const hours = Math.floor(Math.random() * 23) + 1;
+                    const minutes = Math.floor(Math.random() * 59);
+                    const seconds = Math.floor(Math.random() * 59);
+                    const newCountdown = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    container.setAttribute('data-countdown', newCountdown);
+                    
+                    // Adiciona um efeito de destaque quando o contador reinicia
+                    container.classList.add('countdown-reset');
+                    setTimeout(() => {
+                        container.classList.remove('countdown-reset');
+                    }, 2000);
+                }
+            }
+        });
+    }
+    
     window.addEventListener('DOMContentLoaded', () => {
         incrementVisitorCount();
         updateVisitorCounterDisplay();
         atualizarRelogio();
         setInterval(atualizarRelogio, 1000);
+        setInterval(updateAdCountdowns, 1000); // Atualiza o contador a cada segundo
+        updateAdCountdowns(); // Inicializa os contadores
         init();
     });
 </script>
-    
 <p class="text-xs">Dicas e Reclamaçoes : Sandro21_cardeal@hotmail.COM</p
 --- a/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
 +++ b/file:///c%3A/Users/king/Desktop/sandro/jogoweb/matrix.bat
